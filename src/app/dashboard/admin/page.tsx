@@ -56,6 +56,10 @@ export default function DashboardAdmin() {
 
         if (response.status && response.status == "accept") {
             setAllUser(response.users)
+            setTotalOfCourse(response.numberOfCourses)
+            setTotalOfLecture(response.numberOfLectures)
+            setTotalOfVacan(response.numberOfVacancies)
+            setTotalOfStudent(response.numberOfStudents)
         }
         else {
             if (response.message)
