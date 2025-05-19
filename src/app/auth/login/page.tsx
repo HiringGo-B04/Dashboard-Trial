@@ -1,6 +1,6 @@
 "use client"
 
-import { backend_link } from "@/utils"
+import { backend_link, decodeJWT } from "@/utils"
 import { FormEvent, useState } from "react"
 import Cookies from "js-cookie"
 import { useRouter } from "next/navigation"
@@ -24,8 +24,18 @@ export default function Login() {
 
         if (response.status === "accept" && response.token) {
             Cookies.set('token', response.token);
+
+            const dataToken = decodeJWT(response.token)
             alert("Success to Login")
-            router.push("/dashboard/admin")
+            if (dataToken.payload.role == "ADMIN") {
+                router.push("/dashboard/admin")
+            }
+            else if (dataToken.payload.role == "LECTURER") {
+                router.push("/dashboard/lecturer")
+            }
+            else {
+                router.push("/dashboard/student")
+            }
         }
         else {
             if (response.message.startsWith("Validation failed"))
