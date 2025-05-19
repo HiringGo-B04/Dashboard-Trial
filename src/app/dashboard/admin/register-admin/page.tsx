@@ -3,33 +3,32 @@
 import { backend_link } from "@/utils"
 import { FormEvent, useState } from "react"
 import { useRouter } from "next/navigation"
+import Cookies from "js-cookie"
 
 export default function Register() {
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
-    const [nim, setNim] = useState("")
-    const [name, setName] = useState("")
 
     const router = useRouter()
 
     async function register(e: FormEvent) {
         e.preventDefault()
-        const response = await fetch(`${backend_link}/api/auth/public/signup/student`, {
+
+        const token = Cookies.get("token");
+        const response = await fetch(`${backend_link}/api/auth/admin/signup`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({
                 username: username,
                 password: password,
-                nim: nim,
-                fullName: name
             })
         }).then(response => response.json());
 
         if (response.status === "accept") {
             alert(response.messages)
-            router.push("/auth/login")
         }
         else {
             if (response.message && response.message.startsWith("Validation failed"))
@@ -41,7 +40,6 @@ export default function Register() {
                     alert(response.messages)
                 if (response.message)
                     alert(response.message)
-
             }
         }
     }
@@ -55,12 +53,6 @@ export default function Register() {
 
                 <label htmlFor="password">Password</label>
                 <input type="password" id="password" className="border border-1" value={password} onChange={e => setPassword(e.target.value)} />
-
-                <label htmlFor="nim">NIM</label>
-                <input type="text" id="nim" className="border border-1" value={nim} onChange={e => setNim(e.target.value)} />
-
-                <label htmlFor="name">Full Name</label>
-                <input type="text" id="name" className="border border-1" value={name} onChange={e => setName(e.target.value)} />
 
                 <button type="submit">Submit</button>
             </form>
