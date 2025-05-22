@@ -1,4 +1,4 @@
-const backend_link = `http://${process.env.NEXT_PUBLIC_BACKEND_PORT}`
+const backend_link = `${process.env.NEXT_PUBLIC_BACKEND_PORT}`
 
 import Cookies from "js-cookie";
 
