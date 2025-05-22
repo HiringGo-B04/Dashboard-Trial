@@ -1,8 +1,9 @@
 "use client"
 
-import { backend_link } from "@/utils"
+import { backend_link, getMessageOnInput } from "@/utils"
 import { FormEvent, useState } from "react"
 import { useRouter } from "next/navigation"
+import { studentRegis } from "@/controller"
 
 export default function Register() {
     const [username, setUsername] = useState("")
@@ -14,35 +15,14 @@ export default function Register() {
 
     async function register(e: FormEvent) {
         e.preventDefault()
-        const response = await fetch(`${backend_link}/api/auth/public/signup/student`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                username: username,
-                password: password,
-                nim: nim,
-                fullName: name
-            })
-        }).then(response => response.json());
+        const response = await studentRegis(username, password, nim, name);
 
         if (response.status === "accept") {
             alert(response.messages)
             router.push("/auth/login")
         }
         else {
-            if (response.message && response.message.startsWith("Validation failed"))
-                alert("Input must not be blank")
-            if (response.messages && response.messages.startsWith("Validation failed"))
-                alert("Input must not be blank")
-            else {
-                if (response.messages)
-                    alert(response.messages)
-                if (response.message)
-                    alert(response.message)
-
-            }
+            getMessageOnInput(response.message, response.messages)
         }
     }
 

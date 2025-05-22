@@ -37,6 +37,24 @@ async function userLogin(username: string, password: string) {
     return response;
 }
 
+async function studentRegis(username: string, password: string, nim: string, name: string) {
+    const response = await fetch(`${backend_link}/api/auth/public/signup/student`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            username: username,
+            password: password,
+            nim: nim,
+            fullName: name
+        })
+    }).then(response => response.json());
+
+    return response
+}
+
+
 
 // admin dashboard
 const user_route = "/api/account/admin/user"
@@ -85,6 +103,7 @@ async function adminUpdateUser(token: string, requestBody: any) {
 export {
     logout,
     userLogin,
+    studentRegis,
     adminGetAllUsers,
     adminDeleteUser,
     adminUpdateUser
