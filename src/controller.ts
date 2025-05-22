@@ -5,6 +5,10 @@ import Cookies from "js-cookie"
 
 // auth
 const logout_route = "/api/auth/user/logout"
+const login_route = "/api/auth/public/signin"
+const student_regis_route = "/api/auth/public/signup/student"
+const admin_regis_route = "/api/auth/admin/signup"
+const lecturer_regis_route = "/api/auth/admin/signup/lecturer"
 
 async function logout(router: any) {
     const token = Cookies.get("token")
@@ -26,7 +30,7 @@ async function logout(router: any) {
 }
 
 async function userLogin(username: string, password: string) {
-    const response = await fetch(`${backend_link}/api/auth/public/signin`, {
+    const response = await fetch(`${backend_link}${login_route}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -38,7 +42,7 @@ async function userLogin(username: string, password: string) {
 }
 
 async function studentRegis(username: string, password: string, nim: string, name: string) {
-    const response = await fetch(`${backend_link}/api/auth/public/signup/student`, {
+    const response = await fetch(`${backend_link}${student_regis_route}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -55,7 +59,7 @@ async function studentRegis(username: string, password: string, nim: string, nam
 }
 
 async function adminRegisAdmin(token: string, username: string, password: string) {
-    const response = await fetch(`${backend_link}/api/auth/admin/signup`, {
+    const response = await fetch(`${backend_link}${admin_regis_route}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -71,7 +75,7 @@ async function adminRegisAdmin(token: string, username: string, password: string
 }
 
 async function adminRegisLecturer(token: string, username: string, password: string, nip: string, name: string) {
-    const response = await fetch(`${backend_link}/api/auth/admin/signup/lecturer`, {
+    const response = await fetch(`${backend_link}${lecturer_regis_route}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
