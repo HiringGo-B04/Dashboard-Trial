@@ -1,9 +1,10 @@
 "use client"
 
-import { backend_link } from "@/utils"
+import { getMessageOnInput } from "@/utils"
 import { FormEvent, useState } from "react"
 import { useRouter } from "next/navigation"
 import Cookies from "js-cookie"
+import { adminRegisLecturer } from "@/app/auth/controller"
 
 export default function Register() {
     const [username, setUsername] = useState("")
@@ -16,35 +17,18 @@ export default function Register() {
     async function register(e: FormEvent) {
         e.preventDefault()
         const token = Cookies.get("token")
-        const response = await fetch(`${backend_link}/api/auth/admin/signup/lecturer`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({
-                username: username,
-                password: password,
-                nip: nip,
-                fullName: name
-            })
-        }).then(response => response.json());
+        if (!token) {
+            router.push("/auth/login")
+            return;
+        }
+
+        const response = await adminRegisLecturer(token, username, password, nip, name);
 
         if (response.status === "accept") {
             alert(response.messages)
         }
         else {
-            if (response.message && response.message.startsWith("Validation failed"))
-                alert("Input must not be blank")
-            if (response.messages && response.messages.startsWith("Validation failed"))
-                alert("Input must not be blank")
-            else {
-                if (response.messages)
-                    alert(response.messages)
-                if (response.message)
-                    alert(response.message)
-
-            }
+            getMessageOnInput(response.message, response.messages)
         }
     }
 
