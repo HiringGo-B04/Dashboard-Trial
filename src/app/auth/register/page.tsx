@@ -3,7 +3,7 @@
 import { backend_link, getMessageOnInput } from "@/utils"
 import { FormEvent, useState } from "react"
 import { useRouter } from "next/navigation"
-import { studentRegis } from "@/controller"
+import { studentRegis } from "../controller"
 
 export default function Register() {
     const [username, setUsername] = useState("")

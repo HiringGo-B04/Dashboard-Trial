@@ -4,7 +4,7 @@ import { backend_link, decodeJWT, getMessageOnInput } from "@/utils"
 import { FormEvent, useState } from "react"
 import Cookies from "js-cookie"
 import { useRouter } from "next/navigation"
-import { userLogin } from "@/controller"
+import { userLogin } from "../controller"
 
 export default function Login() {
     const [username, setUsername] = useState("")

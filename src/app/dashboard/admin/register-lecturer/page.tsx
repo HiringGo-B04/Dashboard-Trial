@@ -4,7 +4,7 @@ import { backend_link, getMessageOnInput } from "@/utils"
 import { FormEvent, useState } from "react"
 import { useRouter } from "next/navigation"
 import Cookies from "js-cookie"
-import { adminRegisLecturer } from "@/controller"
+import { adminRegisLecturer } from "@/app/auth/controller"
 
 export default function Register() {
     const [username, setUsername] = useState("")
