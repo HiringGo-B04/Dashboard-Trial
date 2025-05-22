@@ -54,6 +54,21 @@ async function studentRegis(username: string, password: string, nim: string, nam
     return response
 }
 
+async function adminRegisAdmin(token: string, username: string, password: string) {
+    const response = await fetch(`${backend_link}/api/auth/admin/signup`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+            username: username,
+            password: password,
+        })
+    }).then(response => response.json());
+
+    return response;
+}
 
 
 // admin dashboard
@@ -105,6 +120,7 @@ export {
     userLogin,
     studentRegis,
     adminGetAllUsers,
+    adminRegisAdmin,
     adminDeleteUser,
     adminUpdateUser
 }
