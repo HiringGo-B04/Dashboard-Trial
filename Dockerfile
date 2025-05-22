@@ -1,7 +1,7 @@
 # Stage 1: Build
 FROM node:18-alpine AS builder
 WORKDIR /app
-COPY .env.production .env.production
+COPY .env.production .env.local
 COPY package.json package-lock.json* ./
 RUN npm install
 COPY . .
@@ -17,3 +17,4 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/next.config.ts ./next.config.ts
 EXPOSE 3000
 CMD ["npm", "start"]
+
