@@ -1,6 +1,7 @@
 # Stage 1: Build
 FROM node:18-alpine AS builder
 WORKDIR /app
+COPY .env.production .env.production
 COPY package.json package-lock.json* ./
 RUN npm install
 COPY . .
