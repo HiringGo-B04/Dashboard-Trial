@@ -1,4 +1,4 @@
-import { adminDeleteUser } from "@/controller";
+import { adminDeleteUser, adminUpdateUser } from "@/controller";
 import { backend_link, checkJWT, decodeJWT, getMessageOnInput } from "@/utils";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
@@ -52,28 +52,18 @@ export function Card({ userId, username, role, fullName, nim, nip, trigger }: { 
             username: username,
         };
 
-        if (currentRole === "LECTURER" && number) {
-            requestBody.nip = number;
-        }
-
-        if (currentRole === "STUDENT" && number) {
-            requestBody.nim = number;
-        }
-
-        if (currentRole !== "ADMIN" && name) {
+        if (currentRole !== "ADMIN") {
             requestBody.fullName = name;
+            requestBody.nip = currentRole === "LECTURER" ? number : null;
+            requestBody.nim = currentRole === "STUDENT" ? number : null;
         }
 
+        if (!token) {
+            router.push("/auth/login")
+            return
+        }
 
-        const response = await fetch(`${backend_link}/api/account/admin/user`, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(requestBody)
-        }).then(response => response.json());
-
+        const response = await adminUpdateUser(token, requestBody)
         if (response.status === "accept") {
             alert(response.message)
             setInputAdmin(false)
@@ -81,16 +71,7 @@ export function Card({ userId, username, role, fullName, nim, nip, trigger }: { 
             trigger()
         }
         else {
-            if (response.message && response.message.startsWith("Validation failed"))
-                alert("Input must not be blank")
-            if (response.messages && response.messages.startsWith("Validation failed"))
-                alert("Input must not be blank")
-            else {
-                if (response.messages)
-                    alert(response.messages)
-                if (response.message)
-                    alert(response.message)
-            }
+            getMessageOnInput(response.message, response.messages)
         }
     }
 

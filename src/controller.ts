@@ -53,9 +53,23 @@ async function adminDeleteUser(token: string, username: string) {
     return response;
 }
 
+async function adminUpdateUser(token: string, requestBody: any) {
+    const response = await fetch(`${backend_link}/api/account/admin/user`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(requestBody)
+    }).then(response => response.json());
+
+    return response;
+}
+
 
 export {
     logout,
     adminGetAllUsers,
-    adminDeleteUser
+    adminDeleteUser,
+    adminUpdateUser
 }
