@@ -1,4 +1,5 @@
-import { backend_link, decodeJWT } from "@/utils";
+import { adminDeleteUser } from "@/controller";
+import { backend_link, checkJWT, decodeJWT, getMessageOnInput } from "@/utils";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import { it } from "node:test";
@@ -24,32 +25,18 @@ export function Card({ userId, username, role, fullName, nim, nip, trigger }: { 
             return
 
         const token = Cookies.get("token");
-        const response = await fetch(`${backend_link}/api/account/admin/user`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({
-                email: username,
-            })
-        }).then(response => response.json());
+        if (!token) {
+            router.push("/auth/login")
+            return
+        }
+        const response = await adminDeleteUser(token, username);
 
         if (response.status === "accept") {
             alert(response.message)
             trigger()
         }
         else {
-            if (response.message && response.message.startsWith("Validation failed"))
-                alert("Input must not be blank")
-            if (response.messages && response.messages.startsWith("Validation failed"))
-                alert("Input must not be blank")
-            else {
-                if (response.messages)
-                    alert(response.messages)
-                if (response.message)
-                    alert(response.message)
-            }
+            getMessageOnInput(response.message, response.messages)
         }
     }
 

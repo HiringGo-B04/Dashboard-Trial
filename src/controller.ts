@@ -3,7 +3,6 @@
 import { backend_link } from "@/utils";
 import Cookies from "js-cookie"
 
-
 // auth
 const logout_route = "/api/auth/user/logout"
 
@@ -27,7 +26,6 @@ async function logout(router: any) {
 }
 
 // admin dashboard
-
 async function adminGetAllUsers(token: string) {
     const response = await fetch(`${backend_link}/api/account/admin/user`, {
         method: 'GET',
@@ -40,8 +38,24 @@ async function adminGetAllUsers(token: string) {
     return response
 }
 
+async function adminDeleteUser(token: string, username: string) {
+    const response = await fetch(`${backend_link}/api/account/admin/user`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+            email: username,
+        })
+    }).then(response => response.json());
+
+    return response;
+}
+
 
 export {
     logout,
-    adminGetAllUsers
+    adminGetAllUsers,
+    adminDeleteUser
 }

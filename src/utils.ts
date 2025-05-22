@@ -57,5 +57,15 @@ async function checkJWT() {
     else return false;
 }
 
-export { decodeJWT, checkJWT, backend_link }
+function getMessageOnInput(message: string | null, messages: string | null) {
+    const currentMessage = message || messages
+    if (currentMessage && currentMessage.startsWith("Validation failed"))
+        alert("Input must not be blank")
+    else {
+        alert(currentMessage)
+    }
+}
+
+
+export { decodeJWT, checkJWT, getMessageOnInput, backend_link }
 
