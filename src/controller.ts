@@ -26,8 +26,10 @@ async function logout(router: any) {
 }
 
 // admin dashboard
+const user_route = "/api/account/admin/user"
+
 async function adminGetAllUsers(token: string) {
-    const response = await fetch(`${backend_link}/api/account/admin/user`, {
+    const response = await fetch(`${backend_link}${user_route}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -39,7 +41,7 @@ async function adminGetAllUsers(token: string) {
 }
 
 async function adminDeleteUser(token: string, username: string) {
-    const response = await fetch(`${backend_link}/api/account/admin/user`, {
+    const response = await fetch(`${backend_link}${user_route}`, {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
@@ -54,7 +56,7 @@ async function adminDeleteUser(token: string, username: string) {
 }
 
 async function adminUpdateUser(token: string, requestBody: any) {
-    const response = await fetch(`${backend_link}/api/account/admin/user`, {
+    const response = await fetch(`${backend_link}${user_route}`, {
         method: 'PATCH',
         headers: {
             'Content-Type': 'application/json',
