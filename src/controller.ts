@@ -70,6 +70,23 @@ async function adminRegisAdmin(token: string, username: string, password: string
     return response;
 }
 
+async function adminRegisLecturer(token: string, username: string, password: string, nip: string, name: string) {
+    const response = await fetch(`${backend_link}/api/auth/admin/signup/lecturer`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+            username: username,
+            password: password,
+            nip: nip,
+            fullName: name
+        })
+    }).then(response => response.json());
+
+    return response;
+}
 
 // admin dashboard
 const user_route = "/api/account/admin/user"
@@ -121,6 +138,7 @@ export {
     studentRegis,
     adminGetAllUsers,
     adminRegisAdmin,
+    adminRegisLecturer,
     adminDeleteUser,
     adminUpdateUser
 }
