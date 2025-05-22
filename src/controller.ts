@@ -25,6 +25,19 @@ async function logout(router: any) {
     }
 }
 
+async function userLogin(username: string, password: string) {
+    const response = await fetch(`${backend_link}/api/auth/public/signin`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password })
+    }).then(response => response.json());
+
+    return response;
+}
+
+
 // admin dashboard
 const user_route = "/api/account/admin/user"
 
@@ -71,6 +84,7 @@ async function adminUpdateUser(token: string, requestBody: any) {
 
 export {
     logout,
+    userLogin,
     adminGetAllUsers,
     adminDeleteUser,
     adminUpdateUser

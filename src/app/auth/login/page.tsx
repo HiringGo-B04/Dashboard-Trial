@@ -1,9 +1,10 @@
 "use client"
 
-import { backend_link, decodeJWT } from "@/utils"
+import { backend_link, decodeJWT, getMessageOnInput } from "@/utils"
 import { FormEvent, useState } from "react"
 import Cookies from "js-cookie"
 import { useRouter } from "next/navigation"
+import { userLogin } from "@/controller"
 
 export default function Login() {
     const [username, setUsername] = useState("")
@@ -14,35 +15,17 @@ export default function Login() {
     async function login(e: FormEvent) {
         e.preventDefault()
 
-        const response = await fetch(`${backend_link}/api/auth/public/signin`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ username, password })
-        }).then(response => response.json());
+        const response = await userLogin(username, password);
 
         if (response.status === "accept" && response.token) {
             Cookies.set('token', response.token);
-
             const dataToken = decodeJWT(response.token)
+
             alert("Success to Login")
-            if (dataToken.payload.role == "ADMIN") {
-                router.push("/dashboard/admin")
-            }
-            else if (dataToken.payload.role == "LECTURER") {
-                router.push("/dashboard/lecturer")
-            }
-            else {
-                router.push("/dashboard/student")
-            }
+            router.push(`/dashboard/${dataToken.payload.role.toLowerCase()}`)
         }
         else {
-            if (response.message.startsWith("Validation failed"))
-                alert("Input must not be blank")
-            else {
-                alert(response.message)
-            }
+            getMessageOnInput(response.message, response.messages)
         }
     }
 
