@@ -1,12 +1,11 @@
 "use client"
-import { backend_link, decodeJWT } from "@/utils";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Card } from "./components/card";
 import { User } from "../../../interface";
 import Cookies from "js-cookie"
-import { adminGetAllUsers, logout } from "../../../controller";
-
+import { adminGetAllUsers } from "@/app/dashboard/admin/controller";
+import { logout } from "@/app/auth/controller"
 
 export default function DashboardAdmin() {
     const [allUser, setAllUser] = useState<User[]>()

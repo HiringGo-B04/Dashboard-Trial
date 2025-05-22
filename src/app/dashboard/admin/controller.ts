@@ -2,8 +2,6 @@
 'use client'
 
 import { backend_link } from "@/utils";
-import Cookies from "js-cookie"
-
 
 // admin dashboard
 const user_route = "/api/account/admin/user"

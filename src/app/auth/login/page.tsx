@@ -1,6 +1,6 @@
 "use client"
 
-import { backend_link, decodeJWT, getMessageOnInput } from "@/utils"
+import { decodeJWT, getMessageOnInput } from "@/utils"
 import { FormEvent, useState } from "react"
 import Cookies from "js-cookie"
 import { useRouter } from "next/navigation"

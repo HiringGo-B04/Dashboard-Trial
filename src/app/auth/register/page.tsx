@@ -1,6 +1,6 @@
 "use client"
 
-import { backend_link, getMessageOnInput } from "@/utils"
+import { getMessageOnInput } from "@/utils"
 import { FormEvent, useState } from "react"
 import { useRouter } from "next/navigation"
 import { studentRegis } from "../controller"

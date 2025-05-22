@@ -1,9 +1,7 @@
-import { adminDeleteUser, adminUpdateUser } from "@/controller";
-import { backend_link, checkJWT, decodeJWT, getMessageOnInput } from "@/utils";
+import { adminDeleteUser, adminUpdateUser } from "@/app/dashboard/admin/controller";
+import { decodeJWT, getMessageOnInput } from "@/utils";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
-import { it } from "node:test";
-import { resolve } from "path";
 import { useEffect, useState } from "react";
 
 export function Card({ userId, username, role, fullName, nim, nip, trigger }: { userId: string, username: string, role: string, fullName: string, nim: string, nip: string, trigger: () => void }) {
