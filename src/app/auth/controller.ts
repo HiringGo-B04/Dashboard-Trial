@@ -4,11 +4,11 @@ import { backend_link } from "@/utils";
 import Cookies from "js-cookie"
 
 // auth
-const logout_route = "api/auth/user/logout"
-const login_route = "api/auth/public/signin"
-const student_regis_route = "api/auth/public/signup/student"
-const admin_regis_route = "api/auth/admin/signup"
-const lecturer_regis_route = "api/auth/admin/signup/lecturer"
+const logout_route = "/api/auth/user/logout"
+const login_route = "/api/auth/public/signin"
+const student_regis_route = "/api/auth/public/signup/student"
+const admin_regis_route = "/api/auth/admin/signup"
+const lecturer_regis_route = "/api/auth/admin/signup/lecturer"
 
 async function logout(router: any) {
     const token = Cookies.get("token")
