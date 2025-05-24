@@ -1,15 +1,12 @@
 "use client"
 
 import { useState, useEffect, FormEvent } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useParams } from "next/navigation"
 import { getLogById, updateLog, kategoriOptions, LogDTO } from "../../controller"
 
-export default function EditLog({ 
-    params 
-}: { 
-    params: { lowonganId: string; logId: string } 
-}) {
+export default function EditLog(){ 
     const router = useRouter()
+    const params = useParams() // Dapatkan params menggunakan useParams
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
     const [isEditable, setIsEditable] = useState(false)
@@ -23,7 +20,7 @@ export default function EditLog({
     const [waktuSelesai, setWaktuSelesai] = useState("")
     const [pesanUntukDosen, setPesanUntukDosen] = useState("")
     const [status, setStatus] = useState("")
-
+    
     useEffect(() => {
         fetchLog()
     }, [params.logId])
@@ -31,7 +28,8 @@ export default function EditLog({
     const fetchLog = async () => {
         try {
             setLoading(true)
-            const log = await getLogById(params.logId)
+            
+            const log = await getLogById(params.logId as string)
             
             // Populate form with existing data
             setJudul(log.judul)
@@ -78,7 +76,7 @@ export default function EditLog({
             return
         }
         
-        const lowonganId = await params.lowonganId
+        //const lowonganId = await params.lowonganId
         const logData: LogDTO = {
             judul,
             keterangan,
@@ -87,12 +85,12 @@ export default function EditLog({
             waktuMulai: `${waktuMulai}:00`, // Add seconds
             waktuSelesai: `${waktuSelesai}:00`, // Add seconds
             pesanUntukDosen: pesanUntukDosen || undefined,
-            idLowongan: params.lowonganId
+            idLowongan: params.lowonganId as string
         }
 
         try {
             setSaving(true)
-            await updateLog(params.logId, logData)
+            await updateLog(params.logId as string, logData)
             alert("Log berhasil diperbarui")
             router.push(`/log/${params.lowonganId}`)
         } catch (err) {

@@ -108,82 +108,104 @@ export default function LogList({
         )
     }
 
-    return (
-        <div className="container mx-auto p-6">
-            <h1 className="text-2xl font-bold mb-6">Daftar Log</h1>
-            
-            <div className="mb-4">
-                <Link
-                    href={`/log/${resolvedParams.lowonganId}/create`}
-                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                >
-                    Tambah Log
-                </Link>
-            </div>
+    // Untuk LogList (tambahkan kolom judul dan perbaikan UI)
+return (
+    <div className="container mx-auto p-6">
+        <div className="flex justify-between items-center mb-6">
+            <h1 className="text-2xl font-bold text-white">Daftar Log</h1>
+            <Link
+                href={`/log/${resolvedParams.lowonganId}/create`}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+                </svg>
+                Tambah Log
+            </Link>
+        </div>
 
-            {logs.length === 0 ? (
-                <div className="text-center py-10">
-                    <p className="text-gray-500">Belum ada log yang dibuat</p>
+        {logs.length === 0 ? (
+            <div className="text-center py-16 bg-white rounded-lg shadow-sm">
+                <div className="mb-4 text-gray-400">
+                    <svg className="mx-auto h-12 w-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
                 </div>
-            ) : (
+                <p className="text-gray-500 mb-2">Belum ada log kegiatan yang tercatat</p>
+                <p className="text-sm text-gray-400">Mulai dengan membuat log kegiatan baru</p>
+            </div>
+        ) : (
+            <div className="bg-white rounded-lg shadow overflow-hidden">
                 <div className="overflow-x-auto">
-                    <table className="min-w-full bg-white border border-gray-200">
-                        <thead className="bg-blue-900 text-white">
+                    <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-blue-50">
                             <tr>
-                                <th className="px-4 py-2 border text-left">No</th>
-                                <th className="px-4 py-2 border text-left">Tanggal</th>
-                                <th className="px-4 py-2 border text-left">Jam</th>
-                                <th className="px-4 py-2 border text-left">Kategori</th>
-                                <th className="px-4 py-2 border text-left">Deskripsi Tugas</th>
-                                <th className="px-4 py-2 border text-center">Status</th>
-                                <th className="px-4 py-2 border text-center">Operation</th>
-                                <th className="px-4 py-2 border text-left">Pesan</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-blue-800 uppercase tracking-wider">No</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-blue-800 uppercase tracking-wider">Judul Kegiatan</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-blue-800 uppercase tracking-wider">Tanggal</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-blue-800 uppercase tracking-wider">Waktu</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-blue-800 uppercase tracking-wider">Kategori</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-blue-800 uppercase tracking-wider">Deskripsi</th>
+                                <th className="px-6 py-3 text-center text-xs font-medium text-blue-800 uppercase tracking-wider">Status</th>
+                                <th className="px-6 py-3 text-center text-xs font-medium text-blue-800 uppercase tracking-wider">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody className="bg-white divide-y divide-gray-200">
                             {logs.map((log, index) => (
-                                <tr key={log.id} className="hover:bg-gray-50">
-                                    <td className="px-4 py-2 border">{index + 1}</td>
-                                    <td className="px-4 py-2 border">{formatDate(log.tanggalLog)}</td>
-                                    <td className="px-4 py-2 border">
-                                        {formatTime(log.waktuMulai)} - {formatTime(log.waktuSelesai)}
-                                        <br />
-                                        <span className="text-sm text-gray-600">
-                                            {calculateDuration(log.waktuMulai, log.waktuSelesai)}
-                                        </span>
+                                <tr key={log.id} className="hover:bg-gray-50 transition-colors">
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{index + 1}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                        {log.judul}
                                     </td>
-                                    <td className="px-4 py-2 border">{getKategoriLabel(log.kategori)}</td>
-                                    <td className="px-4 py-2 border">{log.keterangan}</td>
-                                    <td className="px-4 py-2 border text-center">
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        {formatDate(log.tanggalLog)}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <div className="flex flex-col">
+                                            <span>{formatTime(log.waktuMulai)} - {formatTime(log.waktuSelesai)}</span>
+                                            <span className="text-xs text-gray-400 mt-1">
+                                                ({calculateDuration(log.waktuMulai, log.waktuSelesai)})
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        {getKategoriLabel(log.kategori)}
+                                    </td>
+                                    <td className="px-6 py-4 text-sm text-gray-500 max-w-xs">
+                                        <div className="line-clamp-2">{log.keterangan}</div>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-center">
                                         {getStatusBadge(log.status)}
                                     </td>
-                                    <td className="px-4 py-2 border text-center">
+                                    <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
                                         {log.status === "MENUNGGU" && (
-                                            <>
+                                            <div className="flex items-center justify-center space-x-3">
                                                 <Link
                                                     href={`/log/${resolvedParams.lowonganId}/${log.id}`}
-                                                    className="text-blue-600 hover:underline mr-2"
+                                                    className="text-blue-600 hover:text-blue-900"
                                                 >
-                                                    ✏️ Ubah
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                                                    </svg>
                                                 </Link>
                                                 <button
                                                     onClick={() => handleDelete(log.id)}
-                                                    className="text-red-600 hover:underline"
+                                                    className="text-red-600 hover:text-red-900"
                                                 >
-                                                    🗑️ Hapus
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                                                    </svg>
                                                 </button>
-                                            </>
+                                            </div>
                                         )}
-                                    </td>
-                                    <td className="px-4 py-2 border">
-                                        {log.pesanUntukDosen || "-"}
                                     </td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
                 </div>
-            )}
-        </div>
+            </div>
+        )}
+    </div>
     )
 }
