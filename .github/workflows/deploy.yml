@@ -1,0 +1,51 @@
+name: Deploy Next.js Frontend to Production
+
+on:
+  push:
+    branches:
+      - staging
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/frontend-app:latest
+
+      - name: Deploy frontend container on EC2
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            # Stop and remove existing frontend container
+            docker rm -f frontend_container || true
+
+            # Remove old image
+            docker rmi ${{ secrets.DOCKER_HUB_USERNAME }}/frontend-app:latest || true
+
+            # Pull the latest image
+            docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} -p ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/frontend-app:latest
+
+            # Run new container
+            docker run -d \
+              --name=frontend_container \
+              --network=host \
+              -p 3000:3000 \
+              -e NEXT_PUBLIC_BACKEND_PORT=${{ secrets.NEXT_PUBLIC_BACKEND_PORT }} \
+              ${{ secrets.DOCKER_HUB_USERNAME }}/frontend-app:latest

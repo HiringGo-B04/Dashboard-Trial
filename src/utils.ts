@@ -1,4 +1,4 @@
-const backend_link = "http://localhost:8080"
+const backend_link = `${process.env.NEXT_PUBLIC_BACKEND_PORT}`
 
 import Cookies from "js-cookie";
 
@@ -11,17 +11,29 @@ function base64UrlDecode(base64Url: string) {
         base64Url += '=';
     }
 
-    // Decode base64 string to a regular string
+
     return atob(base64Url);
 }
 
 function decodeJWT(token: string) {
-    // Split the JWT into three parts
     const [header, payload, signature] = token.split('.');
 
-    // Decode the header and payload
     const decodedHeader = JSON.parse(base64UrlDecode(header));
     const decodedPayload = JSON.parse(base64UrlDecode(payload));
+
+    /**
+     * 
+     * Isi JWT itu 
+     *  payload: {
+            "sub": "student@student.com",
+            "role": "STUDENT",
+            "userId": "fdad9500-dbf0-4041-9bb5-349f03b23bb8",
+            "iat": 1747915438,
+            "exp": 1747919038
+        }
+        
+        jadi mau ambil userId => decodeJWT(token).payload.userId
+     */
 
     return {
         header: decodedHeader,
@@ -29,8 +41,14 @@ function decodeJWT(token: string) {
     };
 }
 
+
 async function checkJWT() {
     const access_token = Cookies.get("token")
+
+    /**
+     * True = jwt aman
+     * False = jwt ngga aman
+     */
 
     if (access_token) {
         const exp = decodeJWT(access_token).payload.exp
@@ -39,5 +57,15 @@ async function checkJWT() {
     else return false;
 }
 
-export { decodeJWT, checkJWT, backend_link }
+function getMessageOnInput(message: string | null, messages: string | null) {
+    const currentMessage = message || messages
+    if (currentMessage && currentMessage.startsWith("Validation failed"))
+        alert("Input must not be blank")
+    else {
+        alert(currentMessage)
+    }
+}
+
+
+export { decodeJWT, checkJWT, getMessageOnInput, backend_link }
 

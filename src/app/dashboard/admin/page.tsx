@@ -1,22 +1,11 @@
 "use client"
-import { backend_link } from "@/utils";
-import { ifError } from "assert";
-import Cookies from "js-cookie"
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Card } from "./card";
-import mitt from "next/dist/shared/lib/mitt";
-
-export interface User {
-    userId: string;
-    username: string;
-    password: string | null;
-    role: "STUDENT" | "LECTURER" | "ADMIN" | string;
-    nip: string | null;
-    nim: string | null;
-    fullName: string | null;
-}
-
+import { Card } from "./components/card";
+import { User } from "../../../interface";
+import Cookies from "js-cookie"
+import { adminGetAllUsers } from "@/app/dashboard/admin/controller";
+import { logout } from "@/app/auth/controller"
 
 export default function DashboardAdmin() {
     const [allUser, setAllUser] = useState<User[]>()
@@ -26,33 +15,15 @@ export default function DashboardAdmin() {
     const [totalOfVacan, setTotalOfVacan] = useState(0)
 
     const router = useRouter()
-    async function logout() {
-        const token = Cookies.get("token")
-        const response = await fetch(`${backend_link}/api/auth/user/logout`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({ token: token })
-        }).then(response => response.json());
-
-        if (response.status == "accept") {
-            Cookies.remove('token');
-            alert("Success to logout")
-            router.push("/auth/login")
-        }
-    }
 
     async function getAllUser() {
         const token = Cookies.get("token");
-        const response = await fetch(`${backend_link}/api/account/admin/user`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-        }).then(response => response.json());
+        if (!token) {
+            router.push("/auth/login")
+            return
+        }
+
+        const response = await adminGetAllUsers(token);
 
         if (response.status && response.status == "accept") {
             setAllUser(response.users)
@@ -69,7 +40,6 @@ export default function DashboardAdmin() {
         }
     }
 
-
     useEffect(() => {
         getAllUser()
     }, [router])
@@ -77,7 +47,7 @@ export default function DashboardAdmin() {
     return (
         <div className="flex flex-col gap-10 p-10">
             <div className="flex flex-row gap-10">
-                <button onClick={e => logout()}>Logout</button>
+                <button onClick={e => logout(router)}>Logout</button>
                 <a href="/dashboard/admin/register-admin">Create Admin</a>
                 <a href="/dashboard/admin/register-lecturer">Create Lecturer</a>
             </div>

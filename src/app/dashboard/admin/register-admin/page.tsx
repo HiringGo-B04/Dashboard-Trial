@@ -1,9 +1,10 @@
 "use client"
 
-import { backend_link } from "@/utils"
+import { getMessageOnInput } from "@/utils"
 import { FormEvent, useState } from "react"
 import { useRouter } from "next/navigation"
 import Cookies from "js-cookie"
+import { adminRegisAdmin } from "@/app/auth/controller"
 
 export default function Register() {
     const [username, setUsername] = useState("")
@@ -15,32 +16,18 @@ export default function Register() {
         e.preventDefault()
 
         const token = Cookies.get("token");
-        const response = await fetch(`${backend_link}/api/auth/admin/signup`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({
-                username: username,
-                password: password,
-            })
-        }).then(response => response.json());
+        if (!token) {
+            router.push("/auth/login")
+            return;
+        }
+
+        const response = await adminRegisAdmin(token, username, password);
 
         if (response.status === "accept") {
             alert(response.messages)
         }
         else {
-            if (response.message && response.message.startsWith("Validation failed"))
-                alert("Input must not be blank")
-            if (response.messages && response.messages.startsWith("Validation failed"))
-                alert("Input must not be blank")
-            else {
-                if (response.messages)
-                    alert(response.messages)
-                if (response.message)
-                    alert(response.message)
-            }
+            getMessageOnInput(response.message, response.messages)
         }
     }
 
