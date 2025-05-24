@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { use, useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { 
@@ -12,7 +12,12 @@ import {
     Log
 } from "../controller"
 
-export default function LogList({ params }: { params: { lowonganId: string } }) {
+export default function LogList({ 
+    params 
+}: { 
+    params: Promise<{ lowonganId: string }> 
+}) {
+    const resolvedParams = use(params)
     const [logs, setLogs] = useState<Log[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
@@ -20,16 +25,21 @@ export default function LogList({ params }: { params: { lowonganId: string } }) 
 
     useEffect(() => {
         fetchLogs()
-    }, [params.lowonganId])
+    }, [resolvedParams.lowonganId])
 
     const fetchLogs = async () => {
         try {
             setLoading(true)
-            const data = await getLogsByLowongan(params.lowonganId)
-            setLogs(data)
             setError(null)
+            const data = await getLogsByLowongan(resolvedParams.lowonganId)
+            setLogs(data)
         } catch (err) {
-            setError(err instanceof Error ? err.message : "Terjadi kesalahan")
+            console.error("Error fetching logs:", err)
+            if (err instanceof Error) {
+                setError(err.message)
+            } else {
+                setError("Terjadi kesalahan saat mengambil data log")
+            }
         } finally {
             setLoading(false)
         }
@@ -82,8 +92,18 @@ export default function LogList({ params }: { params: { lowonganId: string } }) 
 
     if (error) {
         return (
-            <div className="flex justify-center items-center min-h-screen">
-                <div className="text-red-600">Error: {error}</div>
+            <div className="container mx-auto p-6">
+                <h1 className="text-2xl font-bold mb-6">Daftar Log</h1>
+                <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded">
+                    <p className="font-semibold">Error:</p>
+                    <p>{error}</p>
+                    <button 
+                        onClick={() => fetchLogs()} 
+                        className="mt-2 bg-red-600 text-white px-4 py-1 rounded hover:bg-red-700"
+                    >
+                        Coba Lagi
+                    </button>
+                </div>
             </div>
         )
     }
@@ -94,7 +114,7 @@ export default function LogList({ params }: { params: { lowonganId: string } }) 
             
             <div className="mb-4">
                 <Link
-                    href={`/log/${params.lowonganId}/create`}
+                    href={`/log/${resolvedParams.lowonganId}/create`}
                     className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
                 >
                     Tambah Log
@@ -141,7 +161,7 @@ export default function LogList({ params }: { params: { lowonganId: string } }) 
                                         {log.status === "MENUNGGU" && (
                                             <>
                                                 <Link
-                                                    href={`/log/${params.lowonganId}/${log.id}`}
+                                                    href={`/log/${resolvedParams.lowonganId}/${log.id}`}
                                                     className="text-blue-600 hover:underline mr-2"
                                                 >
                                                     ✏️ Ubah

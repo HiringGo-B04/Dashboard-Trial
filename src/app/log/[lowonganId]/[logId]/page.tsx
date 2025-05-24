@@ -77,7 +77,8 @@ export default function EditLog({
             alert("Tanggal log tidak boleh di masa depan")
             return
         }
-
+        
+        const lowonganId = await params.lowonganId
         const logData: LogDTO = {
             judul,
             keterangan,

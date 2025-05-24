@@ -37,6 +37,7 @@ export default function CreateLog({ params }: { params: { lowonganId: string } }
             return
         }
 
+        const lowonganId = await params.lowonganId
         const logData: LogDTO = {
             judul,
             keterangan,

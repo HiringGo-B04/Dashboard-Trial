@@ -4,12 +4,12 @@ import { backend_link } from "@/utils";
 import Cookies from "js-cookie"
 
 // Log routes
-const get_logs_by_lowongan_route = "api/log/student/lowongan/"
-const get_log_by_id_route = "api/log/student/"
-const create_log_route = "api/log/student"
-const update_log_route = "api/log/student/"
-const delete_log_route = "api/log/student/"
-const get_honor_route = "api/log/student/honor"
+const get_logs_by_lowongan_route = "/api/log/student/lowongan/"
+const get_log_by_id_route = "/api/log/student/"
+const create_log_route = "/api/log/student"
+const update_log_route = "/api/log/student/"
+const delete_log_route = "/api/log/student/"
+const get_honor_route = "/api/log/student/honor"
 
 // Types
 export interface LogDTO {
