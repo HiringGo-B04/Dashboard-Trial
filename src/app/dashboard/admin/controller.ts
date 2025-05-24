@@ -4,7 +4,7 @@
 import { backend_link } from "@/utils";
 
 // admin dashboard
-const user_route = "api/account/admin/user"
+const user_route = "/api/account/admin/user"
 
 async function adminGetAllUsers(token: string) {
     const response = await fetch(`${backend_link}${user_route}`, {
