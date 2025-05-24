@@ -6,12 +6,11 @@ import { getLogById, updateLog, kategoriOptions, LogDTO } from "../../controller
 
 export default function EditLog(){ 
     const router = useRouter()
-    const params = useParams() // Dapatkan params menggunakan useParams
+    const params = useParams() 
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
     const [isEditable, setIsEditable] = useState(false)
     
-    // Form state
     const [judul, setJudul] = useState("")
     const [keterangan, setKeterangan] = useState("")
     const [kategori, setKategori] = useState("")
@@ -31,17 +30,15 @@ export default function EditLog(){
             
             const log = await getLogById(params.logId as string)
             
-            // Populate form with existing data
+        
             setJudul(log.judul)
             setKeterangan(log.keterangan)
             setKategori(log.kategori)
             setTanggalLog(log.tanggalLog)
-            setWaktuMulai(log.waktuMulai.substring(0, 5)) // Remove seconds
-            setWaktuSelesai(log.waktuSelesai.substring(0, 5)) // Remove seconds
+            setWaktuMulai(log.waktuMulai.substring(0, 5)) 
+            setWaktuSelesai(log.waktuSelesai.substring(0, 5)) 
             setPesanUntukDosen(log.pesanUntukDosen || "")
             setStatus(log.status)
-            
-            // Only editable if status is MENUNGGU
             setIsEditable(log.status === "MENUNGGU")
         } catch (err) {
             alert(err instanceof Error ? err.message : "Gagal memuat log")
@@ -64,26 +61,23 @@ export default function EditLog(){
             return
         }
 
-        // Validate waktu
         if (waktuSelesai <= waktuMulai) {
             alert("Waktu selesai harus setelah waktu mulai")
             return
         }
 
-        // Validate tanggal tidak di masa depan
         if (new Date(tanggalLog) > new Date()) {
             alert("Tanggal log tidak boleh di masa depan")
             return
         }
         
-        //const lowonganId = await params.lowonganId
         const logData: LogDTO = {
             judul,
             keterangan,
             kategori,
             tanggalLog,
-            waktuMulai: `${waktuMulai}:00`, // Add seconds
-            waktuSelesai: `${waktuSelesai}:00`, // Add seconds
+            waktuMulai: `${waktuMulai}:00`, 
+            waktuSelesai: `${waktuSelesai}:00`, 
             pesanUntukDosen: pesanUntukDosen || undefined,
             idLowongan: params.lowonganId as string
         }
@@ -163,7 +157,7 @@ export default function EditLog(){
                         id="kategori"
                         value={kategori}
                         onChange={(e) => setKategori(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 bg-blue-100 text-blue-800 hover:bg-blue-200"
                         disabled={!isEditable}
                         required
                     >

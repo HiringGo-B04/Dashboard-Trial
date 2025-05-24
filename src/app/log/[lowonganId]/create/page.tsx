@@ -8,7 +8,6 @@ export default function CreateLog({ params }: { params: { lowonganId: string } }
     const router = useRouter()
     const [loading, setLoading] = useState(false)
     
-    // Form state
     const [judul, setJudul] = useState("")
     const [keterangan, setKeterangan] = useState("")
     const [kategori, setKategori] = useState("ASISTENSI")
@@ -25,13 +24,12 @@ export default function CreateLog({ params }: { params: { lowonganId: string } }
             return
         }
 
-        // Validate waktu
+
         if (waktuSelesai <= waktuMulai) {
             alert("Waktu selesai harus setelah waktu mulai")
             return
         }
 
-        // Validate tanggal tidak di masa depan
         if (new Date(tanggalLog) > new Date()) {
             alert("Tanggal log tidak boleh di masa depan")
             return
@@ -43,8 +41,8 @@ export default function CreateLog({ params }: { params: { lowonganId: string } }
             keterangan,
             kategori,
             tanggalLog,
-            waktuMulai: `${waktuMulai}:00`, // Add seconds
-            waktuSelesai: `${waktuSelesai}:00`, // Add seconds
+            waktuMulai: `${waktuMulai}:00`, 
+            waktuSelesai: `${waktuSelesai}:00`, 
             pesanUntukDosen: pesanUntukDosen || undefined,
             idLowongan: params.lowonganId
         }
@@ -89,7 +87,7 @@ export default function CreateLog({ params }: { params: { lowonganId: string } }
                         id="kategori"
                         value={kategori}
                         onChange={(e) => setKategori(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 bg-blue-100 text-blue-800 hover:bg-blue-200"
                         required
                     >
                         {kategoriOptions.map(option => (
