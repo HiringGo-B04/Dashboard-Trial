@@ -27,15 +27,26 @@ export async function getMataKuliahByKode(token: string, kode: string) {
 }
 
 export async function createMataKuliah(token: string, data: any) {
-    const response = await fetch(`${backend_link}${course_route}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(data)
-    });
-    return response.json();
+    try {
+        const response = await fetch(`${backend_link}${course_route}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            return { status: "error", message: errorText };
+        }
+
+        const result = await response.json();
+        return result;
+    } catch (error) {
+        return { status: "error", message: "Network error" };
+    }
 }
 
 export async function updateMataKuliah(token: string, kode: string, data: any) {

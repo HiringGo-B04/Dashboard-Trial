@@ -85,7 +85,7 @@ export default function MataKuliahManagement() {
                         <h1 className="text-3xl font-bold">Manajemen Mata Kuliah</h1>
                         <p className="text-primary-foreground mt-2">Kelola data mata kuliah dan dosen pengampu</p>
                     </div>
-                    <a href="/mata-kuliah/create">
+                    <a href="/matakuliah/create">
                         <button className="bg-white text-primary px-4 py-2 rounded-lg hover:bg-opacity-90">
                             Tambah Mata Kuliah
                         </button>
@@ -146,12 +146,12 @@ export default function MataKuliahManagement() {
                                     </td>
                                     <td className="px-4 py-4 whitespace-nowrap text-sm">
                                         <div className="flex gap-2">
-                                            <a href={`/mata-kuliah/detail/${mk.kode}`}>
+                                            <a href={`/matakuliah/detail/${mk.kode}`}>
                                                 <button className="px-3 py-1 bg-blue-500 text-white rounded text-xs">
                                                     Detail
                                                 </button>
                                             </a>
-                                            <a href={`/mata-kuliah/edit/${mk.kode}`}>
+                                            <a href={`/matakuliah/edit/${mk.kode}`}>
                                                 <button className="px-3 py-1 bg-green-500 text-white rounded text-xs">
                                                     Edit
                                                 </button>

@@ -79,7 +79,7 @@ export default function CreateMataKuliah() {
                 alert(response.message || "Gagal membuat mata kuliah");
             } else {
                 alert("Mata kuliah berhasil dibuat");
-                router.push("/mata-kuliah");
+                router.push("/matakuliah");
             }
         } catch (error) {
             alert("Gagal membuat mata kuliah: " + error);
@@ -104,7 +104,7 @@ export default function CreateMataKuliah() {
         <div className="max-w-4xl mx-auto p-6">
             <div className="flex flex-row gap-10 mb-6">
                 <button onClick={e => logout(router)}>Logout</button>
-                <a href="/mata-kuliah">Back to Mata Kuliah</a>
+                <a href="/matakuliah">Back to Mata Kuliah</a>
             </div>
 
             <div className="bg-gradient-to-r from-primary to-secondary rounded-lg p-6 mb-8 text-white shadow-lg">
@@ -144,7 +144,7 @@ export default function CreateMataKuliah() {
                                 max={10}
                                 className="w-full px-4 py-2 rounded-md border border-input"
                                 value={sks}
-                                onChange={(e) => setSks(parseInt(e.target.value))}
+                                onChange={(e) => setSks(parseInt(e.target.value) || 1)}
                             />
                             <p className="text-xs text-muted-foreground mt-1">Antara 1-10 SKS</p>
                         </div>
@@ -220,7 +220,7 @@ export default function CreateMataKuliah() {
                         </button>
                         <button
                             type="button"
-                            onClick={() => router.push("/mata-kuliah")}
+                            onClick={() => router.push("/matakuliah")}
                             className="px-6 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
                         >
                             Batal
