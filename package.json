@@ -11,6 +11,7 @@
   "dependencies": {
     "cookies": "^0.9.1",
     "js-cookie": "^3.0.5",
+    "jwt-decode": "^4.0.0",
     "lucide-react": "^0.510.0",
     "next": "15.3.0",
     "react": "^19.0.0",
