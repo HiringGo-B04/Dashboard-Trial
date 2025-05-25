@@ -4,10 +4,11 @@
 import { backend_link } from "@/utils";
 
 // admin dashboard
-const user_route = "/api/account/admin/user"
+const dosen_get_data = "/api/lowongan/lecturer/dashboard"
+const lowongan = "/api/lowongan/user/lowongan"
 
-async function adminGetAllUsers(token: string) {
-    const response = await fetch(`${backend_link}${user_route}`, {
+async function dosenGetAllData(token: string) {
+    const response = await fetch(`${backend_link}${dosen_get_data}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -18,37 +19,19 @@ async function adminGetAllUsers(token: string) {
     return response
 }
 
-async function adminDeleteUser(token: string, username: string) {
-    const response = await fetch(`${backend_link}${user_route}`, {
-        method: 'DELETE',
+async function lowonganGetAll(token: string) {
+    const response = await fetch(`${backend_link}${lowongan}`, {
+        method: 'GET',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({
-            email: username,
-        })
     }).then(response => response.json());
 
-    return response;
+    return response
 }
-
-async function adminUpdateUser(token: string, requestBody: any) {
-    const response = await fetch(`${backend_link}${user_route}`, {
-        method: 'PATCH',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(requestBody)
-    }).then(response => response.json());
-
-    return response;
-}
-
 
 export {
-    adminGetAllUsers,
-    adminDeleteUser,
-    adminUpdateUser
+    dosenGetAllData,
+    lowonganGetAll
 }
