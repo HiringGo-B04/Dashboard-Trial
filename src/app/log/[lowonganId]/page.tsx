@@ -53,7 +53,7 @@ export default function LogList({
         try {
             await deleteLog(logId)
             alert("Log berhasil dihapus")
-            fetchLogs() // Refresh the list
+            fetchLogs() 
         } catch (err) {
             alert(err instanceof Error ? err.message : "Gagal menghapus log")
         }
@@ -108,7 +108,6 @@ export default function LogList({
         )
     }
 
-    // Untuk LogList (tambahkan kolom judul dan perbaikan UI)
 return (
     <div className="container mx-auto p-6">
         <div className="flex justify-between items-center mb-6">

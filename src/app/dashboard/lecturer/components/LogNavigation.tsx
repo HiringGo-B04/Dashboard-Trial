@@ -19,7 +19,6 @@ export default function LogNavigation() {
             setPendingCount(count)
         } catch (error) {
             console.error("Error fetching pending logs:", error)
-            // Fail silently
         } finally {
             setLoading(false)
         }
