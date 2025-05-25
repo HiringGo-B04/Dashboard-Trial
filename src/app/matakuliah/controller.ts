@@ -74,14 +74,57 @@ export async function partialUpdateMataKuliah(token: string, kode: string, data:
 }
 
 export async function deleteMataKuliah(token: string, kode: string) {
-    const response = await fetch(`${backend_link}${course_route}/${kode}`, {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
-    });
-    return response.json();
+    try {
+        const response = await fetch(`${backend_link}${course_route}/${kode}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+        });
+
+        if (!response.ok) {
+            // Try to get error message from response
+            let errorMessage = `HTTP Error: ${response.status}`;
+
+            try {
+                const errorText = await response.text();
+                if (errorText) {
+                    errorMessage = errorText;
+                }
+            } catch {
+            }
+
+            return {
+                status: "error",
+                message: errorMessage
+            };
+        }
+        if (response.status === 204) {
+            return {
+                status: "success",
+                message: "Mata kuliah berhasil dihapus"
+            };
+        }
+
+        // Try to parse JSON response
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+            return await response.json();
+        } else {
+            return {
+                status: "success",
+                message: "Mata kuliah berhasil dihapus"
+            };
+        }
+
+    } catch (error) {
+        console.error("Delete error:", error);
+        return {
+            status: "error",
+            message: `Network error: ${error}`
+        };
+    }
 }
 
 export async function addLecturer(token: string, kode: string, userId: string) {

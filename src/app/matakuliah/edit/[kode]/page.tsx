@@ -1,13 +1,15 @@
 "use client"
 
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import Cookies from "js-cookie";
 import { getMataKuliahByKode, updateMataKuliah } from "../../controller";
 import { adminGetAllUsers } from "../../../dashboard/admin/controller";
 import { logout } from "../../../auth/controller";
 
-export default function EditMataKuliah({ params }: { params: { kode: string } }) {
+export default function EditMataKuliah({ params }: { params: Promise<{ kode: string }> }) {
+    const resolvedParams = use(params);
+
     const [kode, setKode] = useState("");
     const [nama, setNama] = useState("");
     const [sks, setSks] = useState(1);
@@ -28,7 +30,7 @@ export default function EditMataKuliah({ params }: { params: { kode: string } })
         }
 
         try {
-            const response = await getMataKuliahByKode(token, params.kode);
+            const response = await getMataKuliahByKode(token, resolvedParams.kode);
             if (response && response.kode) {
                 setKode(response.kode);
                 setNama(response.nama);
@@ -37,11 +39,11 @@ export default function EditMataKuliah({ params }: { params: { kode: string } })
                 setSelectedDosen(response.dosenPengampu || []);
             } else {
                 alert("Mata kuliah tidak ditemukan");
-                router.push("/mata-kuliah");
+                router.push("/matakuliah");
             }
         } catch (error) {
             alert("Error: " + error);
-            router.push("/mata-kuliah");
+            router.push("/matakuliah");
         } finally {
             setLoadingData(false);
         }
@@ -102,12 +104,12 @@ export default function EditMataKuliah({ params }: { params: { kode: string } })
         };
 
         try {
-            const response = await updateMataKuliah(token, params.kode, data);
+            const response = await updateMataKuliah(token, resolvedParams.kode, data);
             if (response && response.status === "error") {
                 alert(response.message || "Gagal mengupdate mata kuliah");
             } else {
                 alert("Mata kuliah berhasil diupdate");
-                router.push("/mata-kuliah");
+                router.push("/matakuliah");
             }
         } catch (error) {
             alert("Gagal mengupdate mata kuliah: " + error);
@@ -127,7 +129,7 @@ export default function EditMataKuliah({ params }: { params: { kode: string } })
     useEffect(() => {
         fetchMataKuliah();
         fetchDosen();
-    }, [router, params.kode]);
+    }, [router, resolvedParams.kode]);
 
     if (loadingData) {
         return <div className="p-10">Loading mata kuliah...</div>;
@@ -137,7 +139,7 @@ export default function EditMataKuliah({ params }: { params: { kode: string } })
         <div className="max-w-4xl mx-auto p-6">
             <div className="flex flex-row gap-10 mb-6">
                 <button onClick={e => logout(router)}>Logout</button>
-                <a href="/mata-kuliah">Back to Mata Kuliah</a>
+                <a href="/matakuliah">Back to Mata Kuliah</a>
             </div>
 
             <div className="bg-gradient-to-r from-primary to-secondary rounded-lg p-6 mb-8 text-white shadow-lg">
@@ -253,7 +255,7 @@ export default function EditMataKuliah({ params }: { params: { kode: string } })
                         </button>
                         <button
                             type="button"
-                            onClick={() => router.push("/mata-kuliah")}
+                            onClick={() => router.push("/matakuliah")}
                             className="px-6 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
                         >
                             Batal
