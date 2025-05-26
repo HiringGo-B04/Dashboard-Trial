@@ -42,7 +42,9 @@ export default function Register() {
                 <input type="password" id="password" className="border border-1" value={password} onChange={e => setPassword(e.target.value)} />
 
                 <button type="submit">Submit</button>
+
             </form>
+            <a href="/dashboard/admin">Back</a>
         </div>
     )
 }
