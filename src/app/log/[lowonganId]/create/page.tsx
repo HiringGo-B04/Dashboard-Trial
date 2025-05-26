@@ -1,13 +1,18 @@
 "use client"
 
+import { useParams, useRouter } from "next/navigation"
 import { useState, FormEvent } from "react"
-import { useRouter } from "next/navigation"
 import { createLog, kategoriOptions, LogDTO } from "../../controller"
 
-export default function CreateLog({ params }: { params: { lowonganId: string } }) {
+export default function CreateLog() {
     const router = useRouter()
-    const [loading, setLoading] = useState(false)
-    
+    const params = useParams()
+
+    const lowonganId = params.lowonganId
+    if (!lowonganId || Array.isArray(lowonganId)) {
+        throw new Error("lowonganId tidak valid.")
+    }
+
     const [judul, setJudul] = useState("")
     const [keterangan, setKeterangan] = useState("")
     const [kategori, setKategori] = useState("ASISTENSI")
@@ -15,15 +20,16 @@ export default function CreateLog({ params }: { params: { lowonganId: string } }
     const [waktuMulai, setWaktuMulai] = useState("")
     const [waktuSelesai, setWaktuSelesai] = useState("")
     const [pesanUntukDosen, setPesanUntukDosen] = useState("")
+    const [loading, setLoading] = useState(false)
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault()
-        
+
+        // Validasi
         if (!judul || !keterangan || !tanggalLog || !waktuMulai || !waktuSelesai) {
             alert("Mohon lengkapi semua field yang wajib diisi")
             return
         }
-
 
         if (waktuSelesai <= waktuMulai) {
             alert("Waktu selesai harus setelah waktu mulai")
@@ -35,16 +41,15 @@ export default function CreateLog({ params }: { params: { lowonganId: string } }
             return
         }
 
-        const lowonganId = await params.lowonganId
         const logData: LogDTO = {
             judul,
             keterangan,
             kategori,
             tanggalLog,
-            waktuMulai: `${waktuMulai}:00`, 
-            waktuSelesai: `${waktuSelesai}:00`, 
+            waktuMulai: `${waktuMulai}:00`,
+            waktuSelesai: `${waktuSelesai}:00`,
             pesanUntukDosen: pesanUntukDosen || undefined,
-            idLowongan: params.lowonganId
+            idLowongan: lowonganId,
         }
 
         try {

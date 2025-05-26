@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState, useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
-import { createLamaran, fetchLowongan } from "../../controller"
+import { createLamaran, fetchLowongan, fetchMataKuliah, type MataKuliahDTO } from "../../controller"
 
 interface Lowongan {
   id: string
@@ -26,6 +26,7 @@ export default function FormDaftarLowongan() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [lowonganData, setLowonganData] = useState<Lowongan | null>(null)
+  const [mataKuliahData, setMataKuliahData] = useState<MataKuliahDTO | null>(null)
   const [loadingLowongan, setLoadingLowongan] = useState(true)
   const [validationErrors, setValidationErrors] = useState<{
     sks?: string
@@ -40,6 +41,17 @@ export default function FormDaftarLowongan() {
         const data = await fetchLowongan()
         const lowongan = data.find((l: Lowongan) => l.id === idLowongan)
         setLowonganData(lowongan || null)
+
+        // Fetch mata kuliah details if lowongan found
+        if (lowongan) {
+          try {
+            const mataKuliah = await fetchMataKuliah(lowongan.matkul)
+            setMataKuliahData(mataKuliah)
+          } catch (err) {
+            console.error("Failed to fetch mata kuliah details:", err)
+            // Continue without mata kuliah details
+          }
+        }
       } catch (err) {
         console.error("Failed to fetch lowongan details:", err)
       } finally {
@@ -157,6 +169,7 @@ export default function FormDaftarLowongan() {
               <h1 className="text-4xl font-bold mb-2 text-white">Daftar Lowongan Asisten Dosen</h1>
               <p className="text-blue-100 text-lg opacity-90">
                 Lengkapi formulir pendaftaran untuk mata kuliah {lowonganData.matkul}
+                {mataKuliahData && ` - ${mataKuliahData.nama}`}
               </p>
             </div>
             <div className="hidden md:block">
@@ -195,6 +208,7 @@ export default function FormDaftarLowongan() {
               <div className="bg-slate-700 bg-opacity-60 rounded-xl p-4 border border-slate-600">
                 <h3 className="text-sm font-semibold text-teal-200 mb-2">Mata Kuliah</h3>
                 <p className="text-xl font-bold text-white">{lowonganData.matkul}</p>
+                {mataKuliahData && <p className="text-sm text-teal-300 mt-1">{mataKuliahData.nama}</p>}
               </div>
               <div className="bg-slate-700 bg-opacity-60 rounded-xl p-4 border border-slate-600">
                 <h3 className="text-sm font-semibold text-teal-200 mb-2">Periode</h3>
