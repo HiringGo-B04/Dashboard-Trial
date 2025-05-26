@@ -4,7 +4,7 @@ import { backend_link } from "@/utils";
 import Cookies from "js-cookie"
 
 const lamaran_route = "/api/lamaran/user/all"
-const lowongan_route = "/api/lowongan/user/lowongan" // FIX: Change from "/api/lowongan/user/get"
+const lowongan_route = "/api/lowongan/user/lowongan"
 const honor_route = "/api/log/student/honor"
 
 export interface LowonganData {
@@ -15,7 +15,6 @@ export interface LowonganData {
     totalAsdosNeeded: number;
     totalAsdosRegistered: number;
     totalAsdosAccepted: number;
-    idDosen: string; // Add missing field
 }
 
 export interface LamaranData {
@@ -25,6 +24,14 @@ export interface LamaranData {
     status: string; // MENUNGGU, DITERIMA, DITOLAK
     idMahasiswa: string;
     idLowongan: string;
+}
+
+export interface HonorData {
+    bulan: number;
+    tahun: number;
+    lowonganId: string;
+    honor: number;
+    formattedHonor: string;
 }
 
 async function getAllLowongan(): Promise<LowonganData[]> {
@@ -119,7 +126,7 @@ async function getAllLamaran(): Promise<LamaranData[]> {
     }
 }
 
-async function getHonorData(lowonganId: string, tahun: number, bulan: number) {
+async function getHonorData(lowonganId: string, tahun: number, bulan: number): Promise<HonorData> {
     const token = Cookies.get("token");
 
     if (!token) {
@@ -162,7 +169,14 @@ async function getHonorData(lowonganId: string, tahun: number, bulan: number) {
             } else if (response.status === 403) {
                 throw new Error('Anda tidak memiliki akses untuk melihat data honor.');
             } else if (response.status === 404) {
-                throw new Error('Data honor tidak ditemukan untuk periode ini.');
+                // Return zero honor for 404 instead of throwing error
+                return {
+                    bulan: bulan,
+                    tahun: tahun,
+                    lowonganId: lowonganId,
+                    honor: 0,
+                    formattedHonor: "Rp 0"
+                };
             } else if (response.status === 500) {
                 throw new Error('Terjadi kesalahan di server. Silakan coba lagi.');
             }
@@ -172,12 +186,16 @@ async function getHonorData(lowonganId: string, tahun: number, bulan: number) {
 
         const data = await response.json();
 
-        // Ensure honor is a number
-        if (typeof data.honor !== 'number') {
-            data.honor = 0;
-        }
+        // Ensure honor is a number and properly formatted
+        const honor = typeof data.honor === 'number' ? data.honor : 0;
 
-        return data;
+        return {
+            bulan: data.bulan || bulan,
+            tahun: data.tahun || tahun,
+            lowonganId: data.lowonganId || lowonganId,
+            honor: honor,
+            formattedHonor: data.formattedHonor || `Rp ${honor.toLocaleString('id-ID')}`
+        };
 
     } catch (error) {
         if (error instanceof Error) {
