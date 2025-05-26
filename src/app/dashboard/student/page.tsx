@@ -175,7 +175,7 @@ export default function DashboardStudent() {
             {/* Navigation & Actions */}
             <div className="flex flex-row gap-10">
                 <button onClick={() => logout(router)}>Logout</button>
-                <a href="/lowongan/listLowongan">Daftar Lowongan</a>
+                <a href="/lowongan/list">Daftar Lowongan</a>
             </div>
 
             {/* Statistics - Sesuai dengan requirement PDF */}
