@@ -261,8 +261,8 @@ export default function HonorTable() {
         <div className="bg-gradient-to-r from-blue-800 via-blue-700 to-teal-600 rounded-2xl p-8 mb-8 text-white shadow-2xl border border-blue-600 border-opacity-30">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-4xl font-bold mb-2 text-white">Honor Payment Report</h1>
-              <p className="text-blue-100 text-lg opacity-90">Track your monthly honor payments and working hours</p>
+              <h1 className="text-4xl font-bold mb-2 text-white">Laporan Pembayaran Honor</h1>
+              <p className="text-blue-100 text-lg opacity-90">Track honor bulanan dan jam kerja Anda</p>
             </div>
             <div className="hidden md:block">
               <div className="bg-white bg-opacity-10 rounded-xl p-4 backdrop-blur-sm border border-white border-opacity-20">
@@ -292,13 +292,13 @@ export default function HonorTable() {
                 />
               </svg>
             </div>
-            <h2 className="text-2xl font-bold text-white">Filter by Period</h2>
+            <h2 className="text-2xl font-bold text-white">Filter berdasarkan waktu</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label htmlFor="year" className="block text-sm font-semibold text-teal-200 mb-3">
-                Year
+                Tahun
               </label>
               <select
                 id="year"
@@ -315,7 +315,7 @@ export default function HonorTable() {
             </div>
             <div>
               <label htmlFor="month" className="block text-sm font-semibold text-teal-200 mb-3">
-                Month
+                Bulan
               </label>
               <select
                 id="month"
@@ -343,7 +343,7 @@ export default function HonorTable() {
                 />
               </svg>
               <span className="text-sm font-medium text-teal-100">
-                Showing data for:{" "}
+                Menampilkan data untuk:{" "}
                 <span className="font-bold text-teal-200">
                   {getMonthName(selectedMonth)} {selectedYear}
                 </span>
@@ -422,16 +422,16 @@ export default function HonorTable() {
               <div className="bg-gradient-to-r from-slate-700 to-blue-800 px-6 py-6 border-t border-slate-600">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
                   <div className="text-sm text-slate-300">
-                    <span className="font-semibold text-white">{honorData.length}</span> records found for{" "}
+                    <span className="font-semibold text-white">{honorData.length}</span> hasil ditemukan untuk{" "}
                     {getMonthName(selectedMonth)} {selectedYear}
                   </div>
                   <div className="flex flex-col md:flex-row md:space-x-8 space-y-2 md:space-y-0">
                     <div className="bg-slate-700 bg-opacity-80 px-4 py-2 rounded-lg shadow-lg border border-slate-600">
-                      <span className="text-sm text-slate-300">Total Hours: </span>
+                      <span className="text-sm text-slate-300">Total jam: </span>
                       <span className="font-bold text-lg text-teal-300">{getTotalJam().toFixed(2)}</span>
                     </div>
                     <div className="bg-slate-700 bg-opacity-80 px-4 py-2 rounded-lg shadow-lg border border-slate-600">
-                      <span className="text-sm text-slate-300">Total Payment: </span>
+                      <span className="text-sm text-slate-300">Total bayaran: </span>
                       <span className="font-bold text-lg text-teal-200">
                         Rp {getTotalHonor().toLocaleString("id-ID")}.00
                       </span>
@@ -457,7 +457,7 @@ export default function HonorTable() {
                 d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
               />
             </svg>
-            Refresh Data
+            Perbaharui data
           </button>
         </div>
       </div>
