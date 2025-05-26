@@ -2,6 +2,9 @@ import Cookies from "js-cookie"
 import { backend_link } from "@/utils"
 import { jwtDecode } from "jwt-decode"
 
+const add_lamaran_route = '/api/lamaran/student/add'
+const get_lamaran_route = '/api/lamaran/user/all'
+const get_lowongan_route = '/api/lowongan/user/get'
 
 interface JwtPayload {
     userId: string;
@@ -28,7 +31,7 @@ export async function createLamaran(lamaranInput: Omit<LamaranDTO, "idMahasiswa"
         idMahasiswa: userId,
     }
 
-    const res = await fetch(`${backend_link}api/lamaran/student/add`, {
+    const res = await fetch(`${backend_link}${add_lamaran_route}`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -52,7 +55,7 @@ export async function fetchLowongan(): Promise<any> {
         throw new Error("Kamu belum login")
     }
 
-    const res = await fetch(`${backend_link}api/lowongan/user/get`, {
+    const res = await fetch(`${backend_link}${get_lowongan_route}`, {
         method: "GET",
         headers: {
             Authorization: `Bearer ${token}`,
@@ -71,7 +74,7 @@ export async function fetchLowongan(): Promise<any> {
 
 export async function fetchLamaranUser() {
   const token = Cookies.get("token")
-  const res = await fetch(`${backend_link}api/lamaran/user/all`, {
+  const res = await fetch(`${backend_link}${get_lamaran_route}`, {
     headers: {
       Authorization: `Bearer ${token}`
     }
