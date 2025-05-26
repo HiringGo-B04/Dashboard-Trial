@@ -1,52 +1,15 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { jwtDecode } from "jwt-decode"
-import Cookies from "js-cookie"
-
-interface Lamaran {
-  id: string
-  sks: number
-  ipk: number
-  status: string | null
-  idMahasiswa: string
-  idLowongan: string
-}
-
-interface Lowongan {
-  id: string
-  matkul: string
-  tahun: number
-  term: string
-  totalAsdosNeeded: number
-  totalAsdosRegistered: number
-  totalAsdosAccepted: number
-}
-
-interface HonorData {
-  formattedHonor: string
-  tahun: number
-  honor: number
-  lowonganId: string
-  bulan: number
-}
-
-interface JWTPayload {
-  sub: string
-  role: string
-  userId: string
-  iat: number
-  exp: number
-}
-
-interface HonorTableRow {
-  bulanTahun: string
-  mataKuliah: string
-  jumlahJam: number
-  honorPerJam: number
-  jumlahPembayaran: string
-  rawPembayaran: number
-}
+import {
+  calculateHonorTableData,
+  calculateTotalHonor,
+  calculateTotalJam,
+  generateYearOptions,
+  generateMonthOptions,
+  getMonthName,
+  type HonorTableRow,
+} from "./controller"
 
 export default function HonorTable() {
   const [honorData, setHonorData] = useState<HonorTableRow[]>([])
@@ -59,159 +22,19 @@ export default function HonorTable() {
     fetchHonorData()
   }, [selectedYear, selectedMonth])
 
-  const getUserIdFromToken = (): string | null => {
-    try {
-      const token = Cookies.get("token")
-      if (!token) return null
-
-      const decoded = jwtDecode<JWTPayload>(token)
-      return decoded.userId
-    } catch (error) {
-      console.error("Error decoding token:", error)
-      return null
-    }
-  }
-
   const fetchHonorData = async () => {
     try {
       setLoading(true)
       setError(null)
 
-      const token = Cookies.get("token")
-      if (!token) {
-        setError("User not authenticated")
-        return
-      }
-
-      const userId = getUserIdFromToken()
-      if (!userId) {
-        setError("Invalid token")
-        return
-      }
-
-      const headers = {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      }
-
-      // Fetch all lamaran
-      const lamaranResponse = await fetch("http://localhost:8080/api/lamaran/user/all", {
-        method: "GET",
-        headers: headers,
-      })
-
-      if (!lamaranResponse.ok) {
-        if (lamaranResponse.status === 403) {
-          throw new Error("Access denied. Please login again.")
-        }
-        throw new Error(`Failed to fetch lamaran data: ${lamaranResponse.status}`)
-      }
-
-      const allLamaran: Lamaran[] = await lamaranResponse.json()
-
-      // Filter lamaran by userId
-      const userLamaran = allLamaran.filter((lamaran) => lamaran.idMahasiswa === userId)
-
-      // Get unique lowongan IDs
-      const uniqueLowonganIds = [...new Set(userLamaran.map((lamaran) => lamaran.idLowongan))]
-
-      const honorTableData: HonorTableRow[] = []
-
-      // Fetch honor data for each unique lowongan
-      for (const lowonganId of uniqueLowonganIds) {
-        try {
-          // Fetch lowongan details
-          const lowonganResponse = await fetch(`http://localhost:8080/api/lowongan/user/lowongan/${lowonganId}`, {
-            method: "GET",
-            headers: headers,
-          })
-
-          if (!lowonganResponse.ok) {
-            console.error(`Failed to fetch lowongan ${lowonganId}: ${lowonganResponse.status}`)
-            continue
-          }
-
-          const lowongan: Lowongan = await lowonganResponse.json()
-
-          // Fetch honor data
-          const honorResponse = await fetch(
-            `http://localhost:8080/api/log/student/honor?lowonganId=${lowonganId}&tahun=${selectedYear}&bulan=${selectedMonth}`,
-            {
-              method: "GET",
-              headers: headers,
-            },
-          )
-
-          if (honorResponse.ok) {
-            const honor: HonorData = await honorResponse.json()
-
-            // Calculate jumlah jam (pembagian honor dengan 27500)
-            const honorPerJam = 27500
-            const jumlahJam = Math.round((honor.honor / honorPerJam) * 100) / 100 // Round to 2 decimal places
-
-            // Format bulan/tahun
-            const bulanTahun = `${getMonthName(honor.bulan)} ${honor.tahun}`
-
-            honorTableData.push({
-              bulanTahun,
-              mataKuliah: lowongan.matkul,
-              jumlahJam,
-              honorPerJam,
-              jumlahPembayaran: honor.formattedHonor,
-              rawPembayaran: honor.honor,
-            })
-          }
-        } catch (error) {
-          console.error(`Error fetching data for lowongan ${lowonganId}:`, error)
-        }
-      }
-
-      setHonorData(honorTableData)
+      const data = await calculateHonorTableData(selectedYear, selectedMonth)
+      setHonorData(data)
     } catch (error) {
       console.error("Error fetching honor data:", error)
       setError(error instanceof Error ? error.message : "Failed to load honor data")
     } finally {
       setLoading(false)
     }
-  }
-
-  const getMonthName = (month: number): string => {
-    const months = [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December",
-    ]
-    return months[month - 1]
-  }
-
-  const generateYearOptions = () => {
-    const currentYear = new Date().getFullYear()
-    const years = []
-    for (let i = currentYear - 2; i <= currentYear + 1; i++) {
-      years.push(i)
-    }
-    return years
-  }
-
-  const generateMonthOptions = () => {
-    return Array.from({ length: 12 }, (_, i) => i + 1)
-  }
-
-  const getTotalHonor = () => {
-    return honorData.reduce((sum, row) => sum + row.rawPembayaran, 0)
-  }
-
-  const getTotalJam = () => {
-    return honorData.reduce((sum, row) => sum + row.jumlahJam, 0)
   }
 
   if (loading) {
@@ -261,8 +84,8 @@ export default function HonorTable() {
         <div className="bg-gradient-to-r from-blue-800 via-blue-700 to-teal-600 rounded-2xl p-8 mb-8 text-white shadow-2xl border border-blue-600 border-opacity-30">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-4xl font-bold mb-2 text-white">Laporan Pembayaran Honor</h1>
-              <p className="text-blue-100 text-lg opacity-90">Track honor bulanan dan jam kerja Anda</p>
+              <h1 className="text-4xl font-bold mb-2 text-white">Honor Payment Report</h1>
+              <p className="text-blue-100 text-lg opacity-90">Track your monthly honor payments and working hours</p>
             </div>
             <div className="hidden md:block">
               <div className="bg-white bg-opacity-10 rounded-xl p-4 backdrop-blur-sm border border-white border-opacity-20">
@@ -292,13 +115,13 @@ export default function HonorTable() {
                 />
               </svg>
             </div>
-            <h2 className="text-2xl font-bold text-white">Filter berdasarkan waktu</h2>
+            <h2 className="text-2xl font-bold text-white">Filter by Period</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label htmlFor="year" className="block text-sm font-semibold text-teal-200 mb-3">
-                Tahun
+                Year
               </label>
               <select
                 id="year"
@@ -315,7 +138,7 @@ export default function HonorTable() {
             </div>
             <div>
               <label htmlFor="month" className="block text-sm font-semibold text-teal-200 mb-3">
-                Bulan
+                Month
               </label>
               <select
                 id="month"
@@ -343,7 +166,7 @@ export default function HonorTable() {
                 />
               </svg>
               <span className="text-sm font-medium text-teal-100">
-                Menampilkan data untuk:{" "}
+                Showing data for:{" "}
                 <span className="font-bold text-teal-200">
                   {getMonthName(selectedMonth)} {selectedYear}
                 </span>
@@ -422,18 +245,18 @@ export default function HonorTable() {
               <div className="bg-gradient-to-r from-slate-700 to-blue-800 px-6 py-6 border-t border-slate-600">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
                   <div className="text-sm text-slate-300">
-                    <span className="font-semibold text-white">{honorData.length}</span> hasil ditemukan untuk{" "}
+                    <span className="font-semibold text-white">{honorData.length}</span> records found for{" "}
                     {getMonthName(selectedMonth)} {selectedYear}
                   </div>
                   <div className="flex flex-col md:flex-row md:space-x-8 space-y-2 md:space-y-0">
                     <div className="bg-slate-700 bg-opacity-80 px-4 py-2 rounded-lg shadow-lg border border-slate-600">
-                      <span className="text-sm text-slate-300">Total jam: </span>
-                      <span className="font-bold text-lg text-teal-300">{getTotalJam().toFixed(2)}</span>
+                      <span className="text-sm text-slate-300">Total Hours: </span>
+                      <span className="font-bold text-lg text-teal-300">{calculateTotalJam(honorData).toFixed(2)}</span>
                     </div>
                     <div className="bg-slate-700 bg-opacity-80 px-4 py-2 rounded-lg shadow-lg border border-slate-600">
-                      <span className="text-sm text-slate-300">Total bayaran: </span>
+                      <span className="text-sm text-slate-300">Total Payment: </span>
                       <span className="font-bold text-lg text-teal-200">
-                        Rp {getTotalHonor().toLocaleString("id-ID")}.00
+                        Rp {calculateTotalHonor(honorData).toLocaleString("id-ID")}.00
                       </span>
                     </div>
                   </div>
@@ -457,7 +280,7 @@ export default function HonorTable() {
                 d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
               />
             </svg>
-            Perbaharui data
+            Refresh Data
           </button>
         </div>
       </div>
