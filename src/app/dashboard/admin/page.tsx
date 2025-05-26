@@ -46,17 +46,23 @@ export default function DashboardAdmin() {
 
     return (
         <div className="flex flex-col gap-10 p-10">
+            {/* Navigation & Actions */}
             <div className="flex flex-row gap-10">
                 <button onClick={e => logout(router)}>Logout</button>
                 <a href="/dashboard/admin/register-admin">Create Admin</a>
                 <a href="/dashboard/admin/register-lecturer">Create Lecturer</a>
+                <a href="/matakuliah">Manage Mata Kuliah</a>
             </div>
+
+            {/* Statistics */}
             <div className="flex flex-row gap-10">
                 <div>Number of Student: {totalOfStudent}</div>
                 <div>Number of Lecture: {totalOfLecture}</div>
                 <div>Number of Course: {totalOfCourse}</div>
                 <div>Number of Vacancy: {totalOfVacan}</div>
             </div>
+
+            {/* User Management Cards */}
             <div className="flex flex-wrap gap-3">
                 {
                     allUser?.map(item => (

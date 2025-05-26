@@ -1,5 +1,10 @@
-export default function DashboardDosen() {
+import LogNavigation from "./components/LogNavigation"
+
+export default function LecturerDashboard() {
+
     return (
-        <div>Dosen</div>
+        <div className="container mx-auto p-6">
+            <LogNavigation />
+        </div>
     )
 }
