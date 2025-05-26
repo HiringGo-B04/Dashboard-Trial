@@ -2,20 +2,6 @@
 import { useState } from "react"
 import Link from "next/link"
 import { Plus, Search, Edit, Trash2, Users, Eye } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
 
 interface Lowongan {
   id: string
@@ -82,8 +68,9 @@ export default function ManajemenLowongan() {
   )
 
   const handleDelete = (id: string) => {
-    setLowongan((prev) => prev.filter((item) => item.id !== id))
-    setDeleteId(null)
+    if (window.confirm("Apakah Anda yakin ingin menghapus lowongan ini?")) {
+      setLowongan((prev) => prev.filter((item) => item.id !== id))
+    }
   }
 
   const getStatusBadge = (status: string) => {
@@ -109,107 +96,119 @@ export default function ManajemenLowongan() {
 
       <div className="flex flex-col sm:flex-row gap-4 mb-6">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-          <Input
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+          <input
+            type="text"
             placeholder="Cari mata kuliah atau kode..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
+            className="w-full pl-10 px-4 py-2 rounded-md border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
           />
         </div>
         <Link href="/lowongan/manajemen/buat">
-          <Button className="w-full sm:w-auto">
+          <button className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center">
             <Plus className="h-4 w-4 mr-2" />
             Buat Lowongan Baru
-          </Button>
+          </button>
         </Link>
       </div>
 
-      <div className="bg-white dark:bg-muted rounded-lg shadow-md overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Mata Kuliah</TableHead>
-              <TableHead>Tahun Ajaran</TableHead>
-              <TableHead>Semester</TableHead>
-              <TableHead className="text-center">Dibutuhkan</TableHead>
-              <TableHead className="text-center">Pendaftar</TableHead>
-              <TableHead className="text-center">Diterima</TableHead>
-              <TableHead>Deadline</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-center">Aksi</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredLowongan.map((item) => (
-              <TableRow key={item.id}>
-                <TableCell>
-                  <div>
-                    <div className="font-medium">{item.mataKuliah}</div>
-                    <div className="text-sm text-muted-foreground">{item.kodeMataKuliah}</div>
-                  </div>
-                </TableCell>
-                <TableCell>{item.tahunAjaran}</TableCell>
-                <TableCell>{item.semester}</TableCell>
-                <TableCell className="text-center">{item.jumlahDibutuhkan}</TableCell>
-                <TableCell className="text-center">{item.jumlahPendaftar}</TableCell>
-                <TableCell className="text-center">{item.jumlahDiterima}</TableCell>
-                <TableCell>{new Date(item.deadline).toLocaleDateString("id-ID")}</TableCell>
-                <TableCell>
-                  <span className={getStatusBadge(item.status)}>{item.status}</span>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <Link href={`/lowongan/manajemen/${item.id}`}>
-                      <Button variant="ghost" size="sm">
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                    </Link>
-                    <Link href={`/lowongan/manajemen/${item.id}/pendaftar`}>
-                      <Button variant="ghost" size="sm">
-                        <Users className="h-4 w-4" />
-                      </Button>
-                    </Link>
-                    <Link href={`/lowongan/manajemen/${item.id}/edit`}>
-                      <Button variant="ghost" size="sm">
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                    </Link>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button variant="ghost" size="sm" onClick={() => setDeleteId(item.id)}>
-                          <Trash2 className="h-4 w-4 text-red-500" />
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Hapus Lowongan</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Apakah Anda yakin ingin menghapus lowongan untuk mata kuliah "{item.mataKuliah}"? Tindakan
-                            ini tidak dapat dibatalkan.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Batal</AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={() => handleDelete(item.id)}
-                            className="bg-red-600 hover:bg-red-700"
-                          >
-                            Hapus
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gray-50 dark:bg-gray-700">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Mata Kuliah
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Tahun Ajaran
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Semester
+                </th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Dibutuhkan
+                </th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Pendaftar
+                </th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Diterima
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Deadline
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Status
+                </th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Aksi
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200">
+              {filteredLowongan.map((item) => (
+                <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div>
+                      <div className="font-medium text-gray-900 dark:text-white">{item.mataKuliah}</div>
+                      <div className="text-sm text-gray-500">{item.kodeMataKuliah}</div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                    {item.tahunAjaran}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{item.semester}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900 dark:text-white">
+                    {item.jumlahDibutuhkan}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900 dark:text-white">
+                    {item.jumlahPendaftar}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900 dark:text-white">
+                    {item.jumlahDiterima}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                    {new Date(item.deadline).toLocaleDateString("id-ID")}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={getStatusBadge(item.status)}>{item.status}</span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center justify-center gap-2">
+                      <Link href={`/lowongan/manajemen/${item.id}`}>
+                        <button className="p-1 text-gray-400 hover:text-blue-600 transition-colors">
+                          <Eye className="h-4 w-4" />
+                        </button>
+                      </Link>
+                      <Link href={`/lowongan/manajemen/${item.id}/pendaftar`}>
+                        <button className="p-1 text-gray-400 hover:text-green-600 transition-colors">
+                          <Users className="h-4 w-4" />
+                        </button>
+                      </Link>
+                      <Link href={`/lowongan/manajemen/${item.id}/edit`}>
+                        <button className="p-1 text-gray-400 hover:text-yellow-600 transition-colors">
+                          <Edit className="h-4 w-4" />
+                        </button>
+                      </Link>
+                      <button
+                        onClick={() => handleDelete(item.id)}
+                        className="p-1 text-gray-400 hover:text-red-600 transition-colors"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
         {filteredLowongan.length === 0 && (
           <div className="text-center py-8">
-            <p className="text-muted-foreground">Tidak ada lowongan yang ditemukan</p>
+            <p className="text-gray-500">Tidak ada lowongan yang ditemukan</p>
           </div>
         )}
       </div>

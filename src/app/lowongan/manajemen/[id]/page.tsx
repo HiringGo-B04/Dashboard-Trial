@@ -2,7 +2,6 @@
 import { useState } from "react"
 import Link from "next/link"
 import { ArrowLeft, Edit, Users, Calendar, Clock, CheckCircle, AlertCircle } from "lucide-react"
-import { Button } from "@/components/ui/button"
 
 interface LowonganDetail {
   id: string
@@ -59,7 +58,7 @@ export default function DetailLowongan({ params }: { params: { id: string } }) {
   const isDeadlinePassed = new Date(lowongan.deadline) < new Date()
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
+    <div className="max-w-4xl mx-auto p-6 sm:p-10">
       <Link
         href="/lowongan/manajemen"
         className="inline-flex items-center text-primary hover:text-secondary mb-6 transition-colors"
@@ -79,16 +78,16 @@ export default function DetailLowongan({ params }: { params: { id: string } }) {
           </div>
           <div className="flex gap-2">
             <Link href={`/lowongan/manajemen/${lowongan.id}/edit`}>
-              <Button variant="secondary" size="sm">
+              <button className="px-4 py-2 bg-white bg-opacity-20 text-white rounded-md hover:bg-opacity-30 transition-colors flex items-center">
                 <Edit className="h-4 w-4 mr-2" />
                 Edit
-              </Button>
+              </button>
             </Link>
             <Link href={`/lowongan/manajemen/${lowongan.id}/pendaftar`}>
-              <Button variant="secondary" size="sm">
+              <button className="px-4 py-2 bg-white bg-opacity-20 text-white rounded-md hover:bg-opacity-30 transition-colors flex items-center">
                 <Users className="h-4 w-4 mr-2" />
                 Lihat Pendaftar
-              </Button>
+              </button>
             </Link>
           </div>
         </div>
@@ -189,10 +188,10 @@ export default function DetailLowongan({ params }: { params: { id: string } }) {
               </p>
             </div>
             <Link href={`/lowongan/manajemen/${lowongan.id}/pendaftar`}>
-              <Button>
+              <button className="px-5 py-2.5 bg-primary text-white rounded-md hover:bg-secondary transition-colors flex items-center">
                 <Users className="h-4 w-4 mr-2" />
                 Kelola Pendaftar
-              </Button>
+              </button>
             </Link>
           </div>
         </div>
