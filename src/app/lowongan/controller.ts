@@ -4,7 +4,7 @@ import { jwtDecode } from "jwt-decode"
 
 const add_lamaran_route = '/api/lamaran/student/add'
 const get_lamaran_route = '/api/lamaran/user/all'
-const get_lowongan_route = '/api/lowongan/user/get'
+const get_lowongan_route = '/api/lowongan/user/lowongan'
 
 interface JwtPayload {
     userId: string;
