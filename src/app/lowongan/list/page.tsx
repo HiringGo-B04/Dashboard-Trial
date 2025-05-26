@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { fetchLowongan, fetchLamaranUser } from "../controller"
+import { fetchLowongan, fetchLamaranUser, fetchMataKuliah, type MataKuliahDTO } from "../controller"
 import { jwtDecode } from "jwt-decode"
 import Cookies from "js-cookie"
 
@@ -33,8 +33,12 @@ interface JWTPayload {
   exp: number
 }
 
+interface LowonganWithMataKuliah extends Lowongan {
+  mataKuliahNama?: string
+}
+
 export default function ListLowonganPage() {
-  const [lowongans, setLowongans] = useState<Lowongan[]>([])
+  const [lowongans, setLowongans] = useState<LowonganWithMataKuliah[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [lamarans, setLamarans] = useState<Lamaran[]>([])
@@ -42,6 +46,7 @@ export default function ListLowonganPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedTerm, setSelectedTerm] = useState<string>("all")
   const [selectedYear, setSelectedYear] = useState<string>("all")
+  const [mataKuliahCache, setMataKuliahCache] = useState<Record<string, MataKuliahDTO>>({})
 
   const router = useRouter()
 
@@ -73,6 +78,24 @@ export default function ListLowonganPage() {
       return decoded.userId || null
     } catch (error) {
       console.error("Error decoding JWT:", error)
+      return null
+    }
+  }
+
+  // Function to fetch mata kuliah details
+  const fetchMataKuliahDetails = async (kode: string): Promise<MataKuliahDTO | null> => {
+    // Check cache first
+    if (mataKuliahCache[kode]) {
+      return mataKuliahCache[kode]
+    }
+
+    try {
+      const mataKuliah = await fetchMataKuliah(kode)
+      // Update cache
+      setMataKuliahCache((prev) => ({ ...prev, [kode]: mataKuliah }))
+      return mataKuliah
+    } catch (error) {
+      console.error(`Failed to fetch mata kuliah ${kode}:`, error)
       return null
     }
   }
@@ -111,7 +134,19 @@ export default function ListLowonganPage() {
       try {
         setLoading(true)
         const data = await fetchLowongan()
-        setLowongans(data)
+
+        // Fetch mata kuliah details for each lowongan
+        const lowongansWithMataKuliah = await Promise.all(
+          data.map(async (lowongan: Lowongan) => {
+            const mataKuliah = await fetchMataKuliahDetails(lowongan.matkul)
+            return {
+              ...lowongan,
+              mataKuliahNama: mataKuliah?.nama,
+            }
+          }),
+        )
+
+        setLowongans(lowongansWithMataKuliah)
       } catch (err: any) {
         setError(err.message)
       } finally {
@@ -135,7 +170,9 @@ export default function ListLowonganPage() {
 
   // Filter lowongans based on search and filters
   const filteredLowongans = lowongans.filter((lowongan) => {
-    const matchesSearch = lowongan.matkul.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesSearch =
+      lowongan.matkul.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (lowongan.mataKuliahNama && lowongan.mataKuliahNama.toLowerCase().includes(searchTerm.toLowerCase()))
     const matchesTerm = selectedTerm === "all" || lowongan.term === selectedTerm
     const matchesYear = selectedYear === "all" || lowongan.tahun.toString() === selectedYear
 
@@ -143,7 +180,7 @@ export default function ListLowonganPage() {
   })
 
   // Group filtered lowongans by term & year
-  const grouped: Record<string, Lowongan[]> = {}
+  const grouped: Record<string, LowonganWithMataKuliah[]> = {}
   for (const lowongan of filteredLowongans) {
     const key = `${lowongan.term} ${lowongan.tahun}`
     if (!grouped[key]) grouped[key] = []
@@ -241,7 +278,7 @@ export default function ListLowonganPage() {
     )
   }
 
-  const renderTable = (title: string, data: Lowongan[]) => (
+  const renderTable = (title: string, data: LowonganWithMataKuliah[]) => (
     <div className="mb-8">
       <div className="bg-gradient-to-r from-blue-800 to-teal-700 rounded-t-xl p-4 border-b border-slate-600">
         <h2 className="text-xl font-bold text-white flex items-center">
@@ -296,6 +333,9 @@ export default function ListLowonganPage() {
                   >
                     <td className="px-6 py-4">
                       <div className="text-sm font-semibold text-white">{lowongan.matkul}</div>
+                      {lowongan.mataKuliahNama && (
+                        <div className="text-xs text-teal-300 mt-1">{lowongan.mataKuliahNama}</div>
+                      )}
                     </td>
                     <td className="px-6 py-4 text-center">
                       {isPenuh ? (
@@ -456,7 +496,7 @@ export default function ListLowonganPage() {
                 <input
                   type="text"
                   id="search"
-                  placeholder="Masukkan nama mata kuliah..."
+                  placeholder="Masukkan kode atau nama mata kuliah..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full px-4 py-3 pl-10 border-2 border-slate-600 rounded-xl shadow-lg focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-teal-400 transition-all duration-200 bg-slate-700 text-white font-medium placeholder-slate-400"

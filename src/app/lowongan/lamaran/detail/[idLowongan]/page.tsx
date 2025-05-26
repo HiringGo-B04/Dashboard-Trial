@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
-import { fetchLamaranUser, fetchLowongan } from "@/app/lowongan/controller"
+import { fetchLamaranUser, fetchLowongan, fetchMataKuliah, type MataKuliahDTO } from "@/app/lowongan/controller"
 
 interface Lamaran {
   id: string
@@ -28,6 +28,7 @@ export default function LamaranDetailPage() {
   const router = useRouter()
   const [lamaran, setLamaran] = useState<Lamaran | null>(null)
   const [lowongan, setLowongan] = useState<Lowongan | null>(null)
+  const [mataKuliahData, setMataKuliahData] = useState<MataKuliahDTO | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -52,6 +53,17 @@ export default function LamaranDetailPage() {
         const lowonganData = await fetchLowongan()
         const foundLowongan = lowonganData.find((l: Lowongan) => l.id === idLowongan)
         setLowongan(foundLowongan || null)
+
+        // Fetch mata kuliah data if lowongan found
+        if (foundLowongan) {
+          try {
+            const mataKuliah = await fetchMataKuliah(foundLowongan.matkul)
+            setMataKuliahData(mataKuliah)
+          } catch (err) {
+            console.error("Failed to fetch mata kuliah details:", err)
+            // Continue without mata kuliah details
+          }
+        }
       } catch (err) {
         console.error("Gagal fetch lamaran:", err)
         setError("Gagal memuat data lamaran. Silakan coba lagi.")
@@ -216,6 +228,11 @@ export default function LamaranDetailPage() {
             <div>
               <h1 className="text-4xl font-bold mb-2 text-white">Detail Lamaran</h1>
               <p className="text-blue-100 text-lg opacity-90">Informasi lengkap tentang status lamaran Anda</p>
+              {lowongan && mataKuliahData && (
+                <p className="text-blue-200 text-sm mt-2 opacity-80">
+                  {lowongan.matkul} - {mataKuliahData.nama}
+                </p>
+              )}
             </div>
             <div className="hidden md:block">
               <div className="bg-white bg-opacity-10 rounded-xl p-4 backdrop-blur-sm border border-white border-opacity-20">
@@ -310,7 +327,21 @@ export default function LamaranDetailPage() {
                 <div className="mt-2">{getStatusBadge(lamaran.status)}</div>
               </div>
 
-              
+              <div className="bg-slate-700 bg-opacity-60 rounded-xl p-6 border border-slate-600">
+                <h3 className="text-sm font-semibold text-teal-200 mb-3 flex items-center">
+                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
+                    />
+                  </svg>
+                  ID Lamaran
+                </h3>
+                <p className="text-lg font-mono text-white bg-slate-800 px-3 py-2 rounded-lg">{lamaran.id}</p>
+                <p className="text-sm text-slate-300 mt-1">Simpan ID ini untuk referensi</p>
+              </div>
             </div>
           </div>
         </div>
@@ -337,6 +368,7 @@ export default function LamaranDetailPage() {
                 <div className="bg-slate-700 bg-opacity-60 rounded-xl p-4 border border-slate-600">
                   <h3 className="text-sm font-semibold text-blue-200 mb-2">Mata Kuliah</h3>
                   <p className="text-xl font-bold text-white">{lowongan.matkul}</p>
+                  {mataKuliahData && <p className="text-sm text-blue-300 mt-1">{mataKuliahData.nama}</p>}
                 </div>
                 <div className="bg-slate-700 bg-opacity-60 rounded-xl p-4 border border-slate-600">
                   <h3 className="text-sm font-semibold text-blue-200 mb-2">Periode</h3>
