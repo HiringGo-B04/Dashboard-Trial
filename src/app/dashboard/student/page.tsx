@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { logout } from "@/app/auth/controller";
 import { decodeJWT } from "@/utils";
-import { getAllLowongan, getAllLamaran, getHonorData, LowonganData, LamaranData } from "./controller";
+import { getAllLowongan, getAllLamaran, getHonorData, LowonganData, LamaranData, HonorData } from "./controller";
 
 interface DashboardStats {
     jumlahLowonganTerbuka: number;
@@ -54,36 +54,64 @@ export default function DashboardStudent() {
             const userId = decoded.payload.userId;
             setCurrentUserId(userId);
 
+            console.log("Fetching data for user:", userId);
+
             // Fetch all data with proper error handling
-            const [lowonganData, lamaranData] = await Promise.all([
-                getAllLowongan().catch(err => {
-                    console.error("Failed to fetch lowongan:", err);
-                    return []; // Return empty array as fallback
-                }),
-                getAllLamaran().catch(err => {
-                    console.error("Failed to fetch lamaran:", err);
-                    return []; // Return empty array as fallback
-                })
+            const [lowonganData, lamaranData] = await Promise.allSettled([
+                getAllLowongan(),
+                getAllLamaran()
             ]);
 
-            // Filter lamaran for current user
-            const userLamaran = lamaranData.filter(lamaran => lamaran.idMahasiswa === userId);
+            // Process lowongan data
+            let lowongans: LowonganData[] = [];
+            if (lowonganData.status === 'fulfilled') {
+                lowongans = lowonganData.value;
+                console.log("Lowongan data fetched:", lowongans.length, "items");
+            } else {
+                console.error("Failed to fetch lowongan:", lowonganData.reason);
+                // Continue with empty array
+            }
 
-            // Calculate stats
-            const lowonganTerbuka = lowonganData.filter(lowongan =>
+            // Process lamaran data
+            let lamarans: LamaranData[] = [];
+            if (lamaranData.status === 'fulfilled') {
+                lamarans = lamaranData.value;
+                console.log("Lamaran data fetched:", lamarans.length, "items");
+            } else {
+                console.error("Failed to fetch lamaran:", lamaranData.reason);
+                // Continue with empty array
+            }
+
+            // Filter lamaran for current user
+            const userLamaran = lamarans.filter(lamaran =>
+                lamaran.idMahasiswa === userId
+            );
+
+            console.log("User lamaran:", userLamaran.length, "items");
+
+            // Calculate basic stats
+            const lowonganTerbuka = lowongans.filter(lowongan =>
                 lowongan.totalAsdosAccepted < lowongan.totalAsdosNeeded
             ).length;
 
-            const lamaranDiterima = userLamaran.filter(lamaran => lamaran.status === "DITERIMA").length;
-            const lamaranDitolak = userLamaran.filter(lamaran => lamaran.status === "DITOLAK").length;
-            const lamaranMenunggu = userLamaran.filter(lamaran => lamaran.status === "MENUNGGU").length;
+            const lamaranDiterima = userLamaran.filter(lamaran =>
+                lamaran.status === "DITERIMA"
+            ).length;
+
+            const lamaranDitolak = userLamaran.filter(lamaran =>
+                lamaran.status === "DITOLAK"
+            ).length;
+
+            const lamaranMenunggu = userLamaran.filter(lamaran =>
+                lamaran.status === "MENUNGGU"
+            ).length;
 
             // Get accepted lowongan details
             const acceptedLamaranIds = userLamaran
                 .filter(lamaran => lamaran.status === "DITERIMA")
                 .map(lamaran => lamaran.idLowongan);
 
-            const daftarLowonganDiterima = lowonganData
+            const daftarLowonganDiterima = lowongans
                 .filter(lowongan => acceptedLamaranIds.includes(lowongan.id))
                 .map(lowongan => ({
                     id: lowongan.id,
@@ -92,7 +120,9 @@ export default function DashboardStudent() {
                     term: lowongan.term
                 }));
 
-            // Calculate total honor for ALL accepted lowongan (FIX: not just first one)
+            console.log("Accepted lowongan:", daftarLowonganDiterima.length, "items");
+
+            // Calculate total honor for ALL accepted lowongan
             let totalHonor = 0;
             let totalJam = 0;
 
@@ -101,21 +131,40 @@ export default function DashboardStudent() {
                 const currentYear = currentDate.getFullYear();
                 const currentMonth = currentDate.getMonth() + 1;
 
+                console.log("Calculating honor for", currentMonth, "/", currentYear);
+
                 // Calculate honor for ALL lowongan, not just the first one
-                for (const lowongan of daftarLowonganDiterima) {
+                const honorPromises = daftarLowonganDiterima.map(async (lowongan) => {
                     try {
+                        console.log("Fetching honor for", lowongan.matkul, lowongan.id);
                         const honorData = await getHonorData(
                             lowongan.id,
                             currentYear,
                             currentMonth
                         );
-                        totalHonor += honorData.honor || 0;
-                        totalJam += (honorData.honor || 0) / 27500;
+                        console.log("Honor data for", lowongan.matkul, ":", honorData.honor);
+                        return honorData;
                     } catch (honorError) {
                         console.log(`Could not fetch honor data for ${lowongan.matkul}:`, honorError);
-                        // Continue to next lowongan instead of breaking
+                        // Return zero honor instead of throwing
+                        return {
+                            bulan: currentMonth,
+                            tahun: currentYear,
+                            lowonganId: lowongan.id,
+                            honor: 0,
+                            formattedHonor: "Rp 0"
+                        } as HonorData;
                     }
-                }
+                });
+
+                const honorResults = await Promise.all(honorPromises);
+
+                // Sum up all honor
+                totalHonor = honorResults.reduce((sum, honorData) => sum + honorData.honor, 0);
+                totalJam = Math.round((totalHonor / 27500) * 100) / 100; // Round to 2 decimal places
+
+                console.log("Total honor calculated:", totalHonor);
+                console.log("Total jam calculated:", totalJam);
             }
 
             setStats({
@@ -130,7 +179,7 @@ export default function DashboardStudent() {
 
         } catch (error) {
             console.error("Error fetching dashboard data:", error);
-            setError("Gagal memuat data dashboard. Silakan refresh halaman.");
+            setError(error instanceof Error ? error.message : "Gagal memuat data dashboard. Silakan refresh halaman.");
         } finally {
             setLoading(false);
         }
@@ -175,7 +224,18 @@ export default function DashboardStudent() {
             {/* Navigation & Actions */}
             <div className="flex flex-row gap-10">
                 <button onClick={() => logout(router)}>Logout</button>
-                <a href="/lowongan/list">Daftar Lowongan</a>
+                <button
+                    onClick={() => router.push("/lowongan/list")}
+                    className="text-blue-500 hover:text-blue-700 underline"
+                >
+                    Daftar Lowongan
+                </button>
+                <button
+                    onClick={() => router.push("/honor")}
+                    className="text-purple-500 hover:text-purple-700 underline"
+                >
+                    Lihat Honor
+                </button>
             </div>
 
             {/* Statistics - Sesuai dengan requirement PDF */}
@@ -216,16 +276,41 @@ export default function DashboardStudent() {
             <div>
                 <h2 className="text-xl font-bold mb-4">Akses Fitur Mahasiswa:</h2>
                 <div className="flex flex-wrap gap-4">
-                    <a href="/lowongan/list" className="bg-blue-500 text-white px-4 py-2 rounded">
+                    <button
+                        onClick={() => router.push("/lowongan/list")}
+                        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                    >
                         Mendaftar Lowongan
-                    </a>
+                    </button>
                     {stats.daftarLowonganDiterima.length > 0 && (
-                        <a href={`/log/${stats.daftarLowonganDiterima[0].id}`} className="bg-green-500 text-white px-4 py-2 rounded">
+                        <button
+                            onClick={() => router.push(`/log/${stats.daftarLowonganDiterima[0].id}`)}
+                            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+                        >
                             Manajemen Log
-                        </a>
+                        </button>
                     )}
+                    <button
+                        onClick={() => router.push("/honor")}
+                        className="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600"
+                    >
+                        Dashboard Honor
+                    </button>
                 </div>
             </div>
+
+            {/* Debug Info (can be removed in production) */}
+            {process.env.NODE_ENV === 'development' && (
+                <div className="mt-8 p-4 bg-gray-100 rounded">
+                    <h3 className="font-bold">Debug Info:</h3>
+                    <p>Current User ID: {currentUserId}</p>
+                    <p>Total Lowongan Diterima: {stats.daftarLowonganDiterima.length}</p>
+                    <details>
+                        <summary>Raw Stats Data</summary>
+                        <pre className="text-xs mt-2">{JSON.stringify(stats, null, 2)}</pre>
+                    </details>
+                </div>
+            )}
         </div>
     );
 }
