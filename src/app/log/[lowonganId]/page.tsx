@@ -113,6 +113,12 @@ return (
         <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold text-white">Daftar Log</h1>
             <Link
+                href={`/dashboard/student`}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+            >
+                Kembali ke Dashboard Student
+            </Link>
+            <Link
                 href={`/log/${resolvedParams.lowonganId}/create`}
                 className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
             >
