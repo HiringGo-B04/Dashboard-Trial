@@ -50,6 +50,7 @@ export default function Register() {
 
                 <button type="submit">Submit</button>
             </form>
+            <a href="/dashboard/admin">Back</a>
         </div>
     )
 }
