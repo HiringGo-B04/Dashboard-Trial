@@ -216,7 +216,7 @@ export default function DashboardStudent() {
             <div>
                 <h2 className="text-xl font-bold mb-4">Akses Fitur Mahasiswa:</h2>
                 <div className="flex flex-wrap gap-4">
-                    <a href="/lowongan/listLowongan" className="bg-blue-500 text-white px-4 py-2 rounded">
+                    <a href="/lowongan/list" className="bg-blue-500 text-white px-4 py-2 rounded">
                         Mendaftar Lowongan
                     </a>
                     {stats.daftarLowonganDiterima.length > 0 && (
