@@ -2,7 +2,8 @@
 
 import { backend_link } from "@/utils";
 
-const course_route = "/api/course/admin/matakuliah";
+const course_route = "/api/course/user/matakuliah";
+const admin_course_route = "/api/course/admin/matakuliah";
 
 export async function getAllMataKuliah(token: string) {
     const response = await fetch(`${backend_link}${course_route}`, {
@@ -28,7 +29,7 @@ export async function getMataKuliahByKode(token: string, kode: string) {
 
 export async function createMataKuliah(token: string, data: any) {
     try {
-        const response = await fetch(`${backend_link}${course_route}`, {
+        const response = await fetch(`${backend_link}${admin_course_route}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -50,7 +51,7 @@ export async function createMataKuliah(token: string, data: any) {
 }
 
 export async function updateMataKuliah(token: string, kode: string, data: any) {
-    const response = await fetch(`${backend_link}${course_route}/${kode}`, {
+    const response = await fetch(`${backend_link}${admin_course_route}/${kode}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
@@ -62,7 +63,7 @@ export async function updateMataKuliah(token: string, kode: string, data: any) {
 }
 
 export async function partialUpdateMataKuliah(token: string, kode: string, data: any) {
-    const response = await fetch(`${backend_link}${course_route}/${kode}`, {
+    const response = await fetch(`${backend_link}${admin_course_route}/${kode}`, {
         method: 'PATCH',
         headers: {
             'Content-Type': 'application/json',
@@ -75,7 +76,7 @@ export async function partialUpdateMataKuliah(token: string, kode: string, data:
 
 export async function deleteMataKuliah(token: string, kode: string) {
     try {
-        const response = await fetch(`${backend_link}${course_route}/${kode}`, {
+        const response = await fetch(`${backend_link}${admin_course_route}/${kode}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
@@ -84,7 +85,6 @@ export async function deleteMataKuliah(token: string, kode: string) {
         });
 
         if (!response.ok) {
-            // Try to get error message from response
             let errorMessage = `HTTP Error: ${response.status}`;
 
             try {
@@ -107,7 +107,6 @@ export async function deleteMataKuliah(token: string, kode: string) {
             };
         }
 
-        // Try to parse JSON response
         const contentType = response.headers.get("content-type");
         if (contentType && contentType.includes("application/json")) {
             return await response.json();
@@ -128,7 +127,7 @@ export async function deleteMataKuliah(token: string, kode: string) {
 }
 
 export async function addLecturer(token: string, kode: string, userId: string) {
-    const response = await fetch(`${backend_link}${course_route}/${kode}/dosen/${userId}`, {
+    const response = await fetch(`${backend_link}${admin_course_route}/${kode}/dosen/${userId}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -139,7 +138,7 @@ export async function addLecturer(token: string, kode: string, userId: string) {
 }
 
 export async function removeLecturer(token: string, kode: string, userId: string) {
-    const response = await fetch(`${backend_link}${course_route}/${kode}/dosen/${userId}`, {
+    const response = await fetch(`${backend_link}${admin_course_route}/${kode}/dosen/${userId}`, {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
