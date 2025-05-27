@@ -3,11 +3,13 @@ import { useState } from "react"
 import type React from "react"
 
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter, useParams } from "next/navigation"
 import { ArrowLeft, Save, AlertCircle } from "lucide-react"
 
-export default function EditLowongan({ params }: { params: { id: string } }) {
+export default function EditLowongan() {
   const router = useRouter()
+  const params = useParams()
+
   const [formData, setFormData] = useState({
     mataKuliah: "Pemrograman Paralel",
     kodeMataKuliah: "CSCE604229",

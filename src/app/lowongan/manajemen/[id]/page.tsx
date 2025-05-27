@@ -2,6 +2,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { ArrowLeft, Edit, Users, Calendar, Clock, CheckCircle, AlertCircle } from "lucide-react"
+import { useParams } from "next/navigation"
 
 interface LowonganDetail {
   id: string
@@ -38,7 +39,9 @@ const sampleDetail: LowonganDetail = {
   tanggalDibuat: "2025-01-10",
 }
 
-export default function DetailLowongan({ params }: { params: { id: string } }) {
+export default function DetailLowongan() {
+    const params = useParams()
+  
   const [lowongan] = useState<LowonganDetail>(sampleDetail)
 
   const getStatusBadge = (status: string) => {
