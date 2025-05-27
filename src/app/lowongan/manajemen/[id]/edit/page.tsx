@@ -3,12 +3,12 @@ import { useState, use } from "react"
 import type React from "react"
 
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter, useParams } from "next/navigation"
 import { ArrowLeft, Save, AlertCircle } from "lucide-react"
 
-export default function EditLowongan({ params }: { params: Promise<{ id: string }> }) {
+export default function EditLowongan() {
   const router = useRouter()
-  const resolvedParams = use(params)
+  const params = useParams()
 
   const [formData, setFormData] = useState({
     mataKuliah: "Pemrograman Paralel",
@@ -50,7 +50,7 @@ export default function EditLowongan({ params }: { params: Promise<{ id: string 
 
     // Simulate API call
     setTimeout(() => {
-      console.log("Lowongan diperbarui:", formData, "ID:", resolvedParams.id)
+      console.log("Lowongan diperbarui:", formData, "ID:", params.id)
       setIsSubmitting(false)
       router.push("/lowongan/manajemen")
     }, 1500)

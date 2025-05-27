@@ -2,6 +2,7 @@
 import { useState, use } from "react"
 import Link from "next/link"
 import { ArrowLeft, Edit, Users, Calendar, Clock, CheckCircle, AlertCircle } from "lucide-react"
+import { useParams } from "next/navigation"
 
 interface LowonganDetail {
   id: string
@@ -38,8 +39,9 @@ const sampleDetail: LowonganDetail = {
   tanggalDibuat: "2025-01-10",
 }
 
-export default function DetailLowongan({ params }: { params: Promise<{ id: string }> }) {
-  const resolvedParams = use(params)
+export default function DetailLowongan() {
+    const params = useParams()
+  
   const [lowongan] = useState<LowonganDetail>(sampleDetail)
 
   const getStatusBadge = (status: string) => {
@@ -78,13 +80,13 @@ export default function DetailLowongan({ params }: { params: Promise<{ id: strin
               </div>
             </div>
             <div className="flex gap-2">
-              <Link href={`/lowongan/manajemen/${resolvedParams.id}/edit`}>
+              <Link href={`/lowongan/manajemen/${params.id}/edit`}>
                 <button className="px-4 py-2 bg-white bg-opacity-20 text-white rounded-md hover:bg-opacity-30 transition-colors flex items-center">
                   <Edit className="h-4 w-4 mr-2" />
                   Edit
                 </button>
               </Link>
-              <Link href={`/lowongan/manajemen/${resolvedParams.id}/pendaftar`}>
+              <Link href={`/lowongan/manajemen/${params.id}/pendaftar`}>
                 <button className="px-4 py-2 bg-white bg-opacity-20 text-white rounded-md hover:bg-opacity-30 transition-colors flex items-center">
                   <Users className="h-4 w-4 mr-2" />
                   Lihat Pendaftar
@@ -188,7 +190,7 @@ export default function DetailLowongan({ params }: { params: Promise<{ id: strin
                     Klik tombol di bawah untuk melihat dan mengelola pendaftar
                   </p>
                 </div>
-                <Link href={`/lowongan/manajemen/${resolvedParams.id}/pendaftar`}>
+                <Link href={`/lowongan/manajemen/${params.id}/pendaftar`}>
                   <button className="px-5 py-2.5 bg-primary text-white rounded-md hover:bg-secondary transition-colors flex items-center">
                     <Users className="h-4 w-4 mr-2" />
                     Kelola Pendaftar
